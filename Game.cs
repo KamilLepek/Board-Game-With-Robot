@@ -1,5 +1,4 @@
-﻿using Emgu.CV;
-using Emgu.CV.Structure;
+﻿using BoardGameWithRobot.Controllers;
 
 
 namespace BoardGameWithRobot
@@ -8,9 +7,14 @@ namespace BoardGameWithRobot
     {
         static void Main(string[] args)
         {
-            Image<Bgr, byte> img = new Image<Bgr, byte>(@"G:\image.jpg");
-            CvInvoke.Imshow("test", img);
-            CvInvoke.WaitKey(0);
+            GameController controller = new GameController();
+
+            controller.Initialize();
+
+            while (true)
+            {
+                controller.PrintFrame();
+            }
         }
     }
 }

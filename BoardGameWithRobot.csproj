@@ -67,8 +67,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Map\Board.cs" />
+    <Compile Include="Map\BoardObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\CameraService.cs" />
+    <Compile Include="Utilities\Constants.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
