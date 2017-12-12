@@ -1,22 +1,89 @@
-﻿using Emgu.CV;
+﻿using System;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
 
 namespace BoardGameWithRobot.Utilities
 {
     internal class CameraService
     {
-        private readonly Emgu.CV.Capture cameraDevice;
+        private Capture cameraDevice;
+
+        public Mat ActualFrame { get; }
 
         public CameraService()
         {
-            this.cameraDevice = new Emgu.CV.Capture(Constants.CameraId);
-            this.cameraDevice.Start();
+            this.ActualFrame = new Mat();
         }
 
-        public Mat GetCameraFrame()
+        public bool InitializeCamera()
         {
-            Mat frame = new Mat();
-            this.cameraDevice.Retrieve(frame);
-            return frame;
+            try
+            {
+                this.cameraDevice = new Capture(Constants.CameraId);
+                this.SetCameraProperties();
+                this.cameraDevice.Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+            return true;
+        }
+
+
+        private void SetCameraProperties()
+        {
+            double width, height;
+            switch (Constants.Quality)
+            {
+                case "FHD":
+                    height = 1080.0;
+                    width = 1920.0;
+                    break;
+                case "HD":
+                    height = 720;
+                    width = 1280;
+                    break;
+                case "480":
+                    height = 480.0;
+                    width = 854.0;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Not supported video camera input format");
+            }
+            //this.cameraDevice.SetCaptureProperty(CapProp.FourCC,) //FOURCC code?
+            this.cameraDevice.SetCaptureProperty(CapProp.FrameHeight, height);
+            this.cameraDevice.SetCaptureProperty(CapProp.FrameWidth, width);
+        }
+
+        /// <summary>
+        /// Retrieves single frame from camera device
+        /// </summary>
+        /// <returns>Returns frame as matrix</returns>
+        public void GetCameraFrame()
+        {
+            if (!this.cameraDevice.Retrieve(this.ActualFrame))
+                throw new Exception("Failed to retrieve camera frame");
+        }
+
+        /// <summary>
+        /// Prints image on window
+        /// </summary>
+        /// <param name="image">image to print</param>
+        public void PrintMatrix(Mat image)
+        {
+            CvInvoke.NamedWindow(Constants.WindowName, NamedWindowType.FreeRatio);
+            CvInvoke.Imshow(Constants.WindowName, image);
+            CvInvoke.WaitKey(Constants.MinimumDelayBetweenFrames);
+        }
+
+        /// <summary>
+        /// Prints frame from camera on window
+        /// </summary>
+        public void PrintFrame()
+        {
+            this.PrintMatrix(this.ActualFrame);
         }
     }
 }

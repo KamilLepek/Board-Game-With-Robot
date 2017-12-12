@@ -1,4 +1,6 @@
-﻿using BoardGameWithRobot.Controllers;
+﻿using System.Windows.Forms;
+using BoardGameWithRobot.Controllers;
+using Emgu.CV;
 
 
 namespace BoardGameWithRobot
@@ -9,12 +11,14 @@ namespace BoardGameWithRobot
         {
             GameController controller = new GameController();
 
-            controller.Initialize();
-
-            while (true)
+            if (controller.InitializeGame())
             {
-                controller.PrintFrame();
+                controller.PlayGame();
+                MessageBox.Show("Game has finished!");
+                CvInvoke.WaitKey(0);
+                return;
             }
+            MessageBox.Show("Game initialization failed");
         }
     }
 }
