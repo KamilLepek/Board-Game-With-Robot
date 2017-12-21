@@ -3,9 +3,12 @@ using BoardGameWithRobot.Utilities;
 
 namespace BoardGameWithRobot.Controllers
 {
+    /// <summary>
+    /// Main image processing class
+    /// </summary>
     internal class Detector
     {
-        private CameraService cameraService;
+        private readonly CameraService cameraService;
 
         /// <summary>
         /// Number of frames that we havent detected tracker
@@ -46,6 +49,7 @@ namespace BoardGameWithRobot.Controllers
 
         public bool DetectTrackerInSquare(bool wholeMap = false)
         {
+            BlueSquareTracker.DetectTrackerOnImage(this.cameraService.ActualFrame);
             if (wholeMap)
             {
                 //jesli chcemy zwracac true to update Tracker...
@@ -67,5 +71,8 @@ namespace BoardGameWithRobot.Controllers
             return false;
         }
 
+        
+
+        
     }
 }

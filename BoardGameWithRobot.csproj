@@ -70,13 +70,17 @@
   <ItemGroup>
     <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Controllers\Detector.cs" />
+    <Compile Include="Controllers\SituationController.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Map\Board.cs" />
     <Compile Include="Map\BoardObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\CameraService.cs" />
     <Compile Include="Utilities\Constants.cs" />
-    <Compile Include="Utilities\Tracker.cs" />
+    <Compile Include="Utilities\Enums.cs" />
+    <Compile Include="Utilities\FilteringServices.cs" />
+    <Compile Include="Utilities\MessageLogger.cs" />
+    <Compile Include="Utilities\BlueSquareTracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

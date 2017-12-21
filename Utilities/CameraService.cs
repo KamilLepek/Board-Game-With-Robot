@@ -71,10 +71,11 @@ namespace BoardGameWithRobot.Utilities
         /// Prints image on window
         /// </summary>
         /// <param name="image">image to print</param>
-        public void PrintMatrix(Mat image)
+        /// <param name ="name">name of the window</param>
+        public static void PrintMatrix(Mat image, string name = Constants.WindowName)
         {
-            CvInvoke.NamedWindow(Constants.WindowName, NamedWindowType.FreeRatio);
-            CvInvoke.Imshow(Constants.WindowName, image);
+            CvInvoke.NamedWindow(name, NamedWindowType.FreeRatio);
+            CvInvoke.Imshow(name, image);
             CvInvoke.WaitKey(Constants.MinimumDelayBetweenFrames);
         }
 
@@ -83,7 +84,7 @@ namespace BoardGameWithRobot.Utilities
         /// </summary>
         public void PrintFrame()
         {
-            this.PrintMatrix(this.ActualFrame);
+            PrintMatrix(this.ActualFrame);
         }
     }
 }
