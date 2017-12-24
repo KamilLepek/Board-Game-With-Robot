@@ -1,6 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 namespace BoardGameWithRobot.ImageProcessing
 {
@@ -10,11 +16,6 @@ namespace BoardGameWithRobot.ImageProcessing
     internal class Detector
     {
         private readonly CameraService cameraService;
-
-        /// <summary>
-        /// Number of frames that we havent detected tracker
-        /// </summary>
-        private int framesNoMatch = 0;
 
         public Detector(CameraService camera)
         {
@@ -66,23 +67,26 @@ namespace BoardGameWithRobot.ImageProcessing
             }
             else
             {
-                //szukaj w kwadracie ktorego wymiary masz Tracker...
-                //jesli chcemy zwracac true to update Tracker...
-                this.framesNoMatch = 0;
-                BlueSquareTrackingService.DetectTrackersOnImage(world, this.cameraService.ActualFrame);
-                return true;
-                if (this.framesNoMatch < Constants.NumberOfFramesWithNoTrackerDetectedToEscalate)
+                if (world.TrackersList.Count(item => item.State == Enums.TrackerDetectionState.Active) >=
+                    Constants.MinimumNumberOfActiveTrackers)
                 {
-                    Console.WriteLine("Tracker not detected for " + ++this.framesNoMatch + "frames");
+                    int i = 0;
+                    foreach (var tracker in world.TrackersList)
+                    {
+                        tracker.SearchForTracker();
+#if DEBUG
+                        CameraService.ShowMatrix(tracker.Image.Mat, i++.ToString() );
+#endif
+                    }
                     return true;
                 }
+                else
+                {
+                    Console.WriteLine("Tracker lost. Possibility of board/camera movement!");
+                    return false;
+                }
+
             }
-            Console.WriteLine("Tracker lost. Possibility of board/camera movement!");
-            return false;
         }
-
-        
-
-        
     }
 }

@@ -14,5 +14,11 @@
             Human,
             Robot
         }
+
+        public enum TrackerDetectionState
+        {
+            Active,
+            Inactive
+        }
     }
 }

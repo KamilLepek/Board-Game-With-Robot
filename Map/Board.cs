@@ -6,7 +6,6 @@ using BoardGameWithRobot.Utilities;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
 
 namespace BoardGameWithRobot.Map
 {
@@ -36,7 +35,10 @@ namespace BoardGameWithRobot.Map
             {
                 if (GeometryUtilis.DistanceBetweenPoints(tracker.Center, position) <
                     Constants.TrackerDistanceDifferenceFromLastPosition)
+                {
+                    tracker.UpdateParamsOnDetection();
                     return true;
+                }
             }
             return false;
         }

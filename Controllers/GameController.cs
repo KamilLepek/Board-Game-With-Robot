@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Windows.Forms;
 using BoardGameWithRobot.ImageProcessing;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
@@ -61,26 +62,45 @@ namespace BoardGameWithRobot.Controllers
             {
                 this.timer.Restart();
                 this.cameraService.GetCameraFrame();
+                this.SetPartsOfImage();
 
                 //check if tracker is there where it should be
                 if (!this.detector.DetectTrackerInSquare(this.World))
                 {
-                    // if tracker wasnt spotted in the right place, init everything again
-                    if (!this.detector.InitializeBoard(this.World))
-                    {   
-                        Console.WriteLine("Tracker has been lost!");
-                        return;
-                    }
+                    MessageBox.Show("Trackers has been lost. Game is finished.");
+                    return;
                 }
                 double elapsed = this.timer.ElapsedMilliseconds;
                 Console.WriteLine(elapsed + " ms between frames. " + (int)(1000/elapsed) + " fps.");
 
                 this.AnalyzeAndChangeStateOfGame();
-
-                this.World.PrintMainRectangle(this.cameraService.ActualFrame);
-                this.World.PrintTrackersOnImage(this.cameraService.ActualFrame);
+                this.PrintOnBoard();
                 this.cameraService.ShowFrame();
+                Console.WriteLine(this.World.TrackersList.Count);
             }
+        }
+
+        private void SetPartsOfImage()
+        {
+            foreach (var blueSquareTracker in this.World.TrackersList)
+            {
+                blueSquareTracker.SetImage(this.cameraService.ActualFrame);
+            }
+        }
+
+        private void IncrementFrames()
+        {
+            foreach (var blueSquareTracker in this.World.TrackersList)
+            {
+                if (blueSquareTracker.FramesSinceDetected++ > Constants.MaxFrameAmountTrackerNotDetectedToDelete)
+                    blueSquareTracker.State = Enums.TrackerDetectionState.Inactive;
+            }           
+        }
+
+        private void PrintOnBoard()
+        {
+            this.World.PrintMainRectangle(this.cameraService.ActualFrame);
+            this.World.PrintTrackersOnImage(this.cameraService.ActualFrame);
         }
 
         /// <summary>
@@ -88,6 +108,7 @@ namespace BoardGameWithRobot.Controllers
         /// </summary>
         private void AnalyzeAndChangeStateOfGame()
         {
+            this.IncrementFrames();
             switch (this.situation)
             {
                 case Enums.Situation.AwaitToRollTheDice:

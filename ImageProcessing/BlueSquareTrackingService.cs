@@ -12,7 +12,7 @@ namespace BoardGameWithRobot.ImageProcessing
     internal static class BlueSquareTrackingService
     {
         
-        public static bool DetectTrackersOnImage(Board world, Mat image)
+        public static void DetectTrackersOnImage(Board world, Mat image)
         {
             // Create HSV image from BGR source image
             Mat sourceHSV = new Mat();
@@ -23,9 +23,6 @@ namespace BoardGameWithRobot.ImageProcessing
             Mat hierarchy = new Mat();
             VectorOfVectorOfPoint curves = new VectorOfVectorOfPoint();
             CvInvoke.FindContours(edgesImage, curves, hierarchy, RetrType.Tree, ChainApproxMethod.ChainApproxSimple);
-#if DEBUG
-            CameraService.ShowMatrix(edgesImage, "huhue");
-#endif
             // Detect tracker inside edges (blue square for now)
             VectorOfPoint approxCurve = new VectorOfPoint();
             for (int i = 0; i < curves.Size; i++)
@@ -44,7 +41,6 @@ namespace BoardGameWithRobot.ImageProcessing
                 }
 
             }
-            return true;
         }
 
         private static void UpdateBlueSquareTrackersInfo(Board world, VectorOfPoint approxCurve)
@@ -58,14 +54,14 @@ namespace BoardGameWithRobot.ImageProcessing
             world.TrackersList.Add(new BlueSquareTracker(approxCurve));
         }
 
-        private static void TagBlueSquare(Mat image, VectorOfPoint approxCurve)
+        public static void TagBlueSquare(Mat image, VectorOfPoint approxCurve)
         {
 
             CvInvoke.PutText(image, "k", GeometryUtilis.MassCenter(approxCurve), FontFace.HersheyComplex, 1.0,
                 new Bgr(0, 255, 0).MCvScalar);
         }
 
-        private static bool IsSquareBlue(Mat image, Mat HSV, VectorOfPoint approxCurve)
+        public static bool IsSquareBlue(Mat image, Mat HSV, VectorOfPoint approxCurve)
         {
             Point massCenter = GeometryUtilis.MassCenter(approxCurve);
             int radius = (int)(GeometryUtilis.CalculateSquareRadius(approxCurve, massCenter) * Constants.ColorRadiusDetectingFactor);

@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace BoardGameWithRobot.Utilities
 {
@@ -21,6 +22,7 @@ namespace BoardGameWithRobot.Utilities
 
         public const double TrackerDistanceDifferenceFromLastPosition = 4;
         public const int NumberOfTrackers = 4;
+        public const int MinimumNumberOfActiveTrackers = 3;
         public const int MessageFramesDuration = 50;
         public const int BlueHueBottomConstraint = 190;
         public const int BlueHueTopConstraint = 240;
@@ -31,8 +33,8 @@ namespace BoardGameWithRobot.Utilities
         public const int CameraId = 1;
         public const string WindowName = "Board Game";
         public const int MinimumDelayBetweenFrames = 1; //ms
-        public const int DetectorFrameSearchRadius = 5;
-        public const int NumberOfFramesWithNoTrackerDetectedToEscalate = 20;
+        public const int DetectorFrameSearchRadius = 10;
+        public const int MaxFrameAmountTrackerNotDetectedToDelete = 50;
 
         public const string Quality = "FHD"; //FHD, HD, 480
     }
