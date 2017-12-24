@@ -69,18 +69,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\GameController.cs" />
-    <Compile Include="Controllers\Detector.cs" />
+    <Compile Include="ImageProcessing\Detector.cs" />
     <Compile Include="Controllers\SituationController.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Map\Board.cs" />
     <Compile Include="Map\BoardObject.cs" />
+    <Compile Include="Map\BlueSquareTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\CameraService.cs" />
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\Enums.cs" />
-    <Compile Include="Utilities\FilteringServices.cs" />
+    <Compile Include="ImageProcessing\FilteringServices.cs" />
+    <Compile Include="Utilities\GeometryUtilis.cs" />
     <Compile Include="Utilities\MessageLogger.cs" />
-    <Compile Include="Utilities\BlueSquareTracker.cs" />
+    <Compile Include="ImageProcessing\BlueSquareTrackingService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

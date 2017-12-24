@@ -2,5 +2,9 @@
 {
     internal abstract class BoardObject
     {
+        protected BoardObject()
+        {
+            
+        }
     }
 }

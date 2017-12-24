@@ -1,7 +1,8 @@
 ﻿using System;
+using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
 
-namespace BoardGameWithRobot.Controllers
+namespace BoardGameWithRobot.ImageProcessing
 {
     /// <summary>
     /// Main image processing class
@@ -24,10 +25,18 @@ namespace BoardGameWithRobot.Controllers
         /// Checks if game can start
         /// </summary>
         /// <returns>returns true if starting the game is possible</returns>
-        public bool InitializeBoard()
+        public bool InitializeBoard(Board world)
         {
-            if (!this.DetectTrackerOnInit())
+            if (!this.DetectTrackersOnInit(world)) 
+            {
+                Console.WriteLine("Board initialization failed.");
                 return false;
+            }
+            return true;
+        }
+
+        public bool InitializeRobot()
+        {
             return true;
         }
 
@@ -35,24 +44,24 @@ namespace BoardGameWithRobot.Controllers
         /// Detected blue square on the image to determine if board is available(board has blue square tracker)
         /// </summary>
         /// <returns>true if tracker detected</returns>
-        public bool DetectTrackerOnInit()
+        public bool DetectTrackersOnInit(Board world)
         {
             for (int i = 0; i < Constants.DetectorFrameSearchRadius; i++)
             {
                 this.cameraService.GetCameraFrame();
-                this.DetectTrackerInSquare(true);
-                return true;
+                this.DetectTrackerInSquare(world, true);
             }
-            Console.WriteLine("Tracker not detected!");
+            if (world.TrackersList.Count == Constants.NumberOfTrackers)
+                return true;
+            Console.WriteLine("{0} trackers detected instead of {1}", world.TrackersList.Count, Constants.NumberOfTrackers);
             return false;
         }
 
-        public bool DetectTrackerInSquare(bool wholeMap = false)
+        public bool DetectTrackerInSquare(Board world, bool wholeMap = false)
         {
-            BlueSquareTracker.DetectTrackerOnImage(this.cameraService.ActualFrame);
             if (wholeMap)
             {
-                //jesli chcemy zwracac true to update Tracker...
+                BlueSquareTrackingService.DetectTrackersOnImage(world, this.cameraService.ActualFrame);
                 return true;
             }
             else
@@ -60,6 +69,7 @@ namespace BoardGameWithRobot.Controllers
                 //szukaj w kwadracie ktorego wymiary masz Tracker...
                 //jesli chcemy zwracac true to update Tracker...
                 this.framesNoMatch = 0;
+                BlueSquareTrackingService.DetectTrackersOnImage(world, this.cameraService.ActualFrame);
                 return true;
                 if (this.framesNoMatch < Constants.NumberOfFramesWithNoTrackerDetectedToEscalate)
                 {

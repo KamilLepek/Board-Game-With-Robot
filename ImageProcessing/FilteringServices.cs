@@ -1,7 +1,8 @@
-﻿using Emgu.CV;
+﻿using BoardGameWithRobot.Utilities;
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 
-namespace BoardGameWithRobot.Utilities
+namespace BoardGameWithRobot.ImageProcessing
 {
     /// <summary>
     /// Class uses for providing common image processing services

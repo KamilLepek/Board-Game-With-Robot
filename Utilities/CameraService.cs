@@ -25,7 +25,7 @@ namespace BoardGameWithRobot.Utilities
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Camera initialization failed. " + e);
                 return false;
             }
             return true;
@@ -72,7 +72,7 @@ namespace BoardGameWithRobot.Utilities
         /// </summary>
         /// <param name="image">image to print</param>
         /// <param name ="name">name of the window</param>
-        public static void PrintMatrix(Mat image, string name = Constants.WindowName)
+        public static void ShowMatrix(Mat image, string name = Constants.WindowName)
         {
             CvInvoke.NamedWindow(name, NamedWindowType.FreeRatio);
             CvInvoke.Imshow(name, image);
@@ -82,9 +82,10 @@ namespace BoardGameWithRobot.Utilities
         /// <summary>
         /// Prints frame from camera on window
         /// </summary>
-        public void PrintFrame()
+        public void ShowFrame()
         {
-            PrintMatrix(this.ActualFrame);
+            MessageLogger.AttachCenteredMessageToImage(this.ActualFrame);
+            ShowMatrix(this.ActualFrame);
         }
     }
 }

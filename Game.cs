@@ -15,10 +15,11 @@ namespace BoardGameWithRobot
             {
                 controller.PlayGame();
                 MessageBox.Show("Game has finished!");
-                CvInvoke.WaitKey(0);
+                CvInvoke.WaitKey();
                 return;
             }
             MessageBox.Show("Game initialization failed");
+            CvInvoke.WaitKey();
         }
     }
 }

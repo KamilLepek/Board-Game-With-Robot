@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using BoardGameWithRobot.ImageProcessing;
+using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
 
 namespace BoardGameWithRobot.Controllers
@@ -21,11 +23,14 @@ namespace BoardGameWithRobot.Controllers
 
         private Enums.Turn turn;
 
+        public Board World { get; private set; }
+
         public GameController()
         {
             this.cameraService = new CameraService();
             this.detector = new Detector(this.cameraService);
             this.situationController = new SituationController();
+            this.World = new Board();
         }
 
         /// <summary>
@@ -36,8 +41,12 @@ namespace BoardGameWithRobot.Controllers
         {
             if (!this.cameraService.InitializeCamera())
                 return false;
-            if (!this.detector.InitializeBoard())
+            if (!this.detector.InitializeBoard(this.World))
                 return false;
+            if (!this.detector.InitializeRobot())
+                return false;
+            this.World.SetMainRectangleSize();
+            MessageLogger.LogMessage("Initialization completed successfully");
             this.situation = Enums.Situation.AwaitToRollTheDice;
             this.turn = Enums.Turn.Human;
             return true;
@@ -54,10 +63,10 @@ namespace BoardGameWithRobot.Controllers
                 this.cameraService.GetCameraFrame();
 
                 //check if tracker is there where it should be
-                if (!this.detector.DetectTrackerInSquare())
+                if (!this.detector.DetectTrackerInSquare(this.World))
                 {
                     // if tracker wasnt spotted in the right place, init everything again
-                    if (!this.detector.InitializeBoard())
+                    if (!this.detector.InitializeBoard(this.World))
                     {   
                         Console.WriteLine("Tracker has been lost!");
                         return;
@@ -66,16 +75,18 @@ namespace BoardGameWithRobot.Controllers
                 double elapsed = this.timer.ElapsedMilliseconds;
                 Console.WriteLine(elapsed + " ms between frames. " + (int)(1000/elapsed) + " fps.");
 
-                this.AnalyzeStateOfGame();
+                this.AnalyzeAndChangeStateOfGame();
 
-                this.cameraService.PrintFrame();
+                this.World.PrintMainRectangle(this.cameraService.ActualFrame);
+                this.World.PrintTrackersOnImage(this.cameraService.ActualFrame);
+                this.cameraService.ShowFrame();
             }
         }
 
         /// <summary>
         /// Analyzes and changes actual state of the game
         /// </summary>
-        private void AnalyzeStateOfGame()
+        private void AnalyzeAndChangeStateOfGame()
         {
             switch (this.situation)
             {
