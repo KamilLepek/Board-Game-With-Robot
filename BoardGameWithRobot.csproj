@@ -69,9 +69,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\GameController.cs" />
-    <Compile Include="ImageProcessing\Detector.cs" />
+    <Compile Include="ImageProcessing\Initializator.cs" />
     <Compile Include="Controllers\SituationController.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Utilities\DrawingService.cs" />
+    <Compile Include="ImageProcessing\StaticServices\SimpleImageProcessingServices.cs" />
     <Compile Include="Map\Board.cs" />
     <Compile Include="Map\BoardObject.cs" />
     <Compile Include="Map\BlueSquareTracker.cs" />
@@ -79,7 +81,7 @@
     <Compile Include="Utilities\CameraService.cs" />
     <Compile Include="Utilities\Constants.cs" />
     <Compile Include="Utilities\Enums.cs" />
-    <Compile Include="ImageProcessing\FilteringServices.cs" />
+    <Compile Include="ImageProcessing\StaticServices\FilteringServices.cs" />
     <Compile Include="Utilities\GeometryUtilis.cs" />
     <Compile Include="Utilities\MessageLogger.cs" />
     <Compile Include="ImageProcessing\BlueSquareTrackingService.cs" />

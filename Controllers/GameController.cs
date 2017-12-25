@@ -14,24 +14,27 @@ namespace BoardGameWithRobot.Controllers
     {
         private readonly CameraService cameraService;
 
-        private readonly Detector detector;
+        private readonly Initializator initializator;
 
         private readonly Stopwatch timer = new Stopwatch();
 
         private readonly SituationController situationController;
 
+        private readonly BlueSquareTrackingService blueSquareTrackingService;
+
         private Enums.Situation situation;
 
         private Enums.Turn turn;
 
-        public Board World { get; private set; }
+        private readonly Board board;
 
         public GameController()
         {
+            this.board = new Board();
             this.cameraService = new CameraService();
-            this.detector = new Detector(this.cameraService);
             this.situationController = new SituationController();
-            this.World = new Board();
+            this.blueSquareTrackingService = new BlueSquareTrackingService(this.cameraService, this.board);
+            this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService, this.board);
         }
 
         /// <summary>
@@ -42,11 +45,10 @@ namespace BoardGameWithRobot.Controllers
         {
             if (!this.cameraService.InitializeCamera())
                 return false;
-            if (!this.detector.InitializeBoard(this.World))
+            if (!this.initializator.InitializeBoard())
                 return false;
-            if (!this.detector.InitializeRobot())
+            if (!this.initializator.InitializeRobot())
                 return false;
-            this.World.SetMainRectangleSize();
             MessageLogger.LogMessage("Initialization completed successfully");
             this.situation = Enums.Situation.AwaitToRollTheDice;
             this.turn = Enums.Turn.Human;
@@ -62,45 +64,42 @@ namespace BoardGameWithRobot.Controllers
             {
                 this.timer.Restart();
                 this.cameraService.GetCameraFrame();
-                this.SetPartsOfImage();
+                this.SetFragmentsOfImageForTrackersDetection();
 
                 //check if tracker is there where it should be
-                if (!this.detector.DetectTrackerInSquare(this.World))
+                if (!this.blueSquareTrackingService.DetectTrackerInSquare())
                 {
                     MessageBox.Show("Trackers has been lost. Game is finished.");
                     return;
                 }
-                double elapsed = this.timer.ElapsedMilliseconds;
-                Console.WriteLine(elapsed + " ms between frames. " + (int)(1000/elapsed) + " fps.");
+                Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " + (int)(1000/ this.timer.ElapsedMilliseconds) + " fps.");
 
                 this.AnalyzeAndChangeStateOfGame();
-                this.PrintOnBoard();
+                this.DisplayElementsOnBoard();
                 this.cameraService.ShowFrame();
-                Console.WriteLine(this.World.TrackersList.Count);
             }
         }
 
-        private void SetPartsOfImage()
+        private void SetFragmentsOfImageForTrackersDetection()
         {
-            foreach (var blueSquareTracker in this.World.TrackersList)
+            foreach (var blueSquareTracker in this.board.TrackersList)
             {
                 blueSquareTracker.SetImage(this.cameraService.ActualFrame);
             }
         }
 
-        private void IncrementFrames()
+        private void IncrementFramesAndCheckTrackersState()
         {
-            foreach (var blueSquareTracker in this.World.TrackersList)
+            foreach (var blueSquareTracker in this.board.TrackersList)
             {
                 if (blueSquareTracker.FramesSinceDetected++ > Constants.MaxFrameAmountTrackerNotDetectedToDelete)
                     blueSquareTracker.State = Enums.TrackerDetectionState.Inactive;
             }           
         }
 
-        private void PrintOnBoard()
+        private void DisplayElementsOnBoard()
         {
-            this.World.PrintMainRectangle(this.cameraService.ActualFrame);
-            this.World.PrintTrackersOnImage(this.cameraService.ActualFrame);
+            this.board.PrintTrackersOnImage(this.cameraService.ActualFrame);
         }
 
         /// <summary>
@@ -108,7 +107,7 @@ namespace BoardGameWithRobot.Controllers
         /// </summary>
         private void AnalyzeAndChangeStateOfGame()
         {
-            this.IncrementFrames();
+            this.IncrementFramesAndCheckTrackersState();
             switch (this.situation)
             {
                 case Enums.Situation.AwaitToRollTheDice:

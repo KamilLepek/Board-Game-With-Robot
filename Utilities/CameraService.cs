@@ -72,7 +72,7 @@ namespace BoardGameWithRobot.Utilities
         /// </summary>
         /// <param name="image">image to print</param>
         /// <param name ="name">name of the window</param>
-        public static void ShowMatrix(Mat image, string name = Constants.WindowName)
+        public void ShowMatrix(Mat image, string name = Constants.WindowName)
         {
             CvInvoke.NamedWindow(name, NamedWindowType.FreeRatio);
             CvInvoke.Imshow(name, image);
@@ -85,7 +85,7 @@ namespace BoardGameWithRobot.Utilities
         public void ShowFrame()
         {
             MessageLogger.AttachCenteredMessageToImage(this.ActualFrame);
-            ShowMatrix(this.ActualFrame);
+            this.ShowMatrix(this.ActualFrame);
         }
     }
 }

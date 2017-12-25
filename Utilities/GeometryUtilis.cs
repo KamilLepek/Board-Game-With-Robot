@@ -10,7 +10,7 @@ namespace BoardGameWithRobot.Utilities
     {
         public static Point MassCenter(VectorOfPoint approxCurve)
         {
-            MCvMoments moment = CvInvoke.Moments(approxCurve, false);
+            MCvMoments moment = CvInvoke.Moments(approxCurve);
             return new Point((int)(moment.M10 / moment.M00), (int)(moment.M01 / moment.M00));
         }
 

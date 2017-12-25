@@ -30,13 +30,23 @@ namespace BoardGameWithRobot.ImageProcessing
         }
 
         /// <summary>
-        /// returns image blurred by gaussian function
+        /// Returns image blurred by gaussian function
         /// </summary>
         public static Mat GaussianBlurImage(Mat source)
         {
             Mat result = new Mat();
             CvInvoke.GaussianBlur(source, result, Constants.KSize, Constants.GaussianX);
             return result;
+        }
+
+        /// <summary>
+        /// Returns same image as HSV
+        /// </summary>
+        public static Mat BGRToHSV(Mat image)
+        {
+            Mat HSV = new Mat();
+            CvInvoke.CvtColor(image, HSV, ColorConversion.Bgr2Hsv);
+            return HSV;
         }
     }
 }
