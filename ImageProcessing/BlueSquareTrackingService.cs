@@ -69,13 +69,9 @@ namespace BoardGameWithRobot.ImageProcessing
             if (this.board.TrackersList.Count(item => item.State == Enums.TrackerDetectionState.Active) >=
                 Constants.MinimumNumberOfActiveTrackers)
             {
-                int i = 0;
                 foreach (var tracker in this.board.TrackersList)
                 {
                     tracker.SearchForTracker();
-#if DEBUG
-                    this.cameraService.ShowMatrix(tracker.Image.Mat, i++.ToString());
-#endif
                 }
                 return true;
             }

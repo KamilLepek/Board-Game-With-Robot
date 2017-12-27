@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using BoardGameWithRobot.ImageProcessing;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
+using Emgu.CV;
 
 namespace BoardGameWithRobot.Controllers
 {
@@ -18,9 +19,9 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly Stopwatch timer = new Stopwatch();
 
-        private readonly SituationController situationController;
-
         private readonly BlueSquareTrackingService blueSquareTrackingService;
+
+        private readonly DiceDetectingService diceDetectingService;
 
         private Enums.Situation situation;
 
@@ -28,13 +29,17 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly Board board;
 
+        private int diceDetectionFrames = 0;
+
+        private int dicePipsNumber = 0;
+
         public GameController()
         {
             this.board = new Board();
             this.cameraService = new CameraService();
-            this.situationController = new SituationController();
             this.blueSquareTrackingService = new BlueSquareTrackingService(this.cameraService, this.board);
             this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService, this.board);
+            this.diceDetectingService = new DiceDetectingService(this.cameraService);
         }
 
         /// <summary>
@@ -49,7 +54,6 @@ namespace BoardGameWithRobot.Controllers
                 return false;
             if (!this.initializator.InitializeRobot())
                 return false;
-            MessageLogger.LogMessage("Initialization completed successfully");
             this.situation = Enums.Situation.AwaitToRollTheDice;
             this.turn = Enums.Turn.Human;
             return true;
@@ -72,11 +76,11 @@ namespace BoardGameWithRobot.Controllers
                     MessageBox.Show("Trackers has been lost. Game is finished.");
                     return;
                 }
-                Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " + (int)(1000/ this.timer.ElapsedMilliseconds) + " fps.");
 
                 this.AnalyzeAndChangeStateOfGame();
                 this.DisplayElementsOnBoard();
                 this.cameraService.ShowFrame();
+                Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " + (int)(1000 / this.timer.ElapsedMilliseconds) + " fps.");
             }
         }
 
@@ -111,23 +115,45 @@ namespace BoardGameWithRobot.Controllers
             switch (this.situation)
             {
                 case Enums.Situation.AwaitToRollTheDice:
-                    if (this.situationController.CheckIfDiceStartedRolling())
-                        this.situation = Enums.Situation.DiceIsRolling;
-                    break;
-                case Enums.Situation.DiceIsRolling:
-                    if (this.situationController.CheckIfDiceFinnishedRolling())
-                        this.situation = Enums.Situation.AwaitForReaction;
+                    MessageLogger.LogMessage(string.Format("{0} turn. Roll the dice!", this.turn.ToString()));
+                    this.ChangeStateUponDiceDetection();
                     break;
                 case Enums.Situation.AwaitForReaction:
-                    if (this.situationController.CheckIfPlayerFinishedTurn())
+                    MessageLogger.LogMessage(string.Format("{0} turn. Move {1} squares!", this.turn.ToString(), this.dicePipsNumber));
+                    if (false)//validate that player has finished his movement!
                     {
-                        this.situation = Enums.Situation.DiceIsRolling;
+                        this.situation = Enums.Situation.AwaitToRollTheDice;
                         this.ChangeTurn();
                     }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             } 
+        }
+
+        /// <summary>
+        /// Changes state if dice have been detected long enough to ensure that the result is not affected by movement
+        /// </summary>
+        private void ChangeStateUponDiceDetection()
+        {
+            if (this.diceDetectingService.DetectDice())
+                this.diceDetectionFrames++;
+            else
+                this.diceDetectionFrames--;
+            if (this.diceDetectionFrames < 0)
+            {
+                // Reset region in order to search again
+                this.diceDetectionFrames = 0;
+                this.diceDetectingService.IsDiceRegionDefined = false;
+            }
+
+            if (this.diceDetectionFrames == Constants.DiceFramesDetectedAcceptanceMargin)
+            {
+                this.dicePipsNumber = this.diceDetectingService.DetermineNumberAndResetPipList();
+                this.diceDetectionFrames = 0;
+                this.diceDetectingService.IsDiceRegionDefined = false;
+                this.situation = Enums.Situation.AwaitForReaction;
+            }
         }
 
         private void ChangeTurn()

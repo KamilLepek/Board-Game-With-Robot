@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using BoardGameWithRobot.Utilities;
@@ -38,10 +39,38 @@ namespace BoardGameWithRobot.Map
 
         public void PrintTrackersOnImage(Mat image)
         {
+            if (!this.TrackersList.Any())
+                throw new Exception("Empty trackers list!");
             foreach (var blueSquareTracker in this.TrackersList)
             {
                 blueSquareTracker.PrintTracker(image);
             }
+        }
+
+        public Point DetermineTopLeftCornerOfTrackersListRectangle()
+        {
+            Point p = new Point(Int32.MaxValue, Int32.MaxValue);
+            foreach (var blueSquareTracker in this.TrackersList)
+            {
+                if (blueSquareTracker.Center.X + blueSquareTracker.Center.Y < p.X + p.Y)
+                {
+                    p = blueSquareTracker.Center;
+                }
+            }
+            return p;
+        }
+
+        public Point DetermineBottomRightCornerOfTrackersListRectangle()
+        {
+            Point p = new Point(0, 0);
+            foreach (var blueSquareTracker in this.TrackersList)
+            {
+                if (blueSquareTracker.Center.X + blueSquareTracker.Center.Y > p.X + p.Y)
+                {
+                    p = blueSquareTracker.Center;
+                }
+            }
+            return p;
         }
     }
 }

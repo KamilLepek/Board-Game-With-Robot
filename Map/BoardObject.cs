@@ -12,12 +12,12 @@ namespace BoardGameWithRobot.Map
         /// <summary>
         /// Center of the square that the object is inside
         /// </summary>
-        public Point Center { get; set; }
+        public Point Center { get; }
 
         /// <summary>
         /// Half of the diagonal of the square
         /// </summary>
-        public int Radius { get; set; }
+        public int Radius { get; }
 
         protected BoardObject(VectorOfPoint curve)
         {

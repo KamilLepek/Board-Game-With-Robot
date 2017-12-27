@@ -31,11 +31,17 @@ namespace BoardGameWithRobot.ImageProcessing
             return approxCurve;
         }
 
-        public static bool IsCurveSmallEnoughToBeIgnored(VectorOfPoint curve)
+        public static bool IsCurveSizeBetweenMargins(VectorOfPoint curve, int topMargin = Constants.DefaultCurveSizeIgnoringMargin, int bottomMargin = 0)
         {
-            if (Math.Abs(CvInvoke.ContourArea(curve)) < Constants.CurveSizeIgnoringMargin)
+            double area = Math.Abs(CvInvoke.ContourArea(curve));
+            if (area < topMargin && area > bottomMargin)
                 return true;
             return false;
+        }
+
+        public static bool IsCurveSmallEnoughToBeIgnored(VectorOfPoint curve, int topMargin = Constants.DefaultCurveSizeIgnoringMargin)
+        {
+            return IsCurveSizeBetweenMargins(curve, topMargin);
         }
 
         /// <summary>
@@ -100,6 +106,23 @@ namespace BoardGameWithRobot.ImageProcessing
                     return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Cut Fragment of given image
+        /// </summary>
+        /// <param name="image">given image</param>
+        /// <param name="center">center of square of interest</param>
+        /// <param name="radius">half of the diagonal of the square called radius</param>
+        /// <returns>fragment of given image as Image</returns>
+        public static Image<Rgb, byte> CutFragmentOfImage(Mat image, Point center, int radius)
+        {
+            Mat temp = image.Clone();
+            var regionOfInterest = new Rectangle(center.X - radius,
+                center.Y - radius, 2 * radius, 2 * radius);
+            Image<Rgb, Byte> img = temp.ToImage<Rgb, Byte>();
+            img.ROI = regionOfInterest;
+            return img;
         }
     }
 }

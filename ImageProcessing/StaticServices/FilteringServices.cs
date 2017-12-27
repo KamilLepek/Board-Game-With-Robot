@@ -1,6 +1,7 @@
 ﻿using BoardGameWithRobot.Utilities;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
 
 namespace BoardGameWithRobot.ImageProcessing
 {
@@ -15,14 +16,38 @@ namespace BoardGameWithRobot.ImageProcessing
         public static Mat CannyImage(Mat source)
         {
             Mat result = new Mat();
-            CvInvoke.Canny(GaussianBlurImage(GreyImage(source)), result, Constants.ThresholdLow, Constants.ThresholdHigh, Constants.Aperture);
+            CvInvoke.Canny(GaussianBlurImage(GrayImage(source)), result, Constants.ThresholdLow, Constants.ThresholdHigh, Constants.Aperture);
+            return result;
+        }
+
+        public static Mat BgrToBinary(Mat source, int determiner)
+        {
+            return GrayToBinary(GrayImage(source), determiner);
+        }
+
+        public static Mat GrayToBinary(Mat source, int determiner)
+        {
+            Image<Gray, byte> grayImage = source.ToImage<Gray, byte>();
+
+            for (int i = 0; i < grayImage.Height; i++)
+            {
+                for (int j = 0; j < grayImage.Width; j++)
+                {
+                    if (grayImage.Data[i, j, 0] < determiner)
+                        grayImage.Data[i, j, 0] = 0;
+                    else
+                        grayImage.Data[i, j, 0] = 255;
+                }
+            }
+            Mat result = grayImage.Mat.Clone();
+            grayImage.Dispose();
             return result;
         }
 
         /// <summary>
-        /// Returns image converted to greyscale
+        /// Returns image converted to grayscale
         /// </summary>
-        public static Mat GreyImage(Mat source)
+        public static Mat GrayImage(Mat source)
         {
             Mat result = new Mat();
             CvInvoke.CvtColor(source, result, ColorConversion.Bgr2Gray);

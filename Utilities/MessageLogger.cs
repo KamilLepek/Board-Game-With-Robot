@@ -20,7 +20,7 @@ namespace BoardGameWithRobot.Utilities
                 return;
             // 47 znaków
             CvInvoke.PutText(image, message,
-                new Point((int)((image.Width / 2) * (1 - message.Length / 48f)), image.Height / 20), FontFace.HersheyComplex,
+                new Point((int)((image.Width / 2) * (1 - message.Length / 50f)), image.Height / 20), FontFace.HersheyComplex,
                 2.0, new Bgr(0, 255, 0).MCvScalar);
             if (FramesDuration-- == 0)
                 message = null;

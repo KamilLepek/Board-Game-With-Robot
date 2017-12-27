@@ -5,7 +5,6 @@
         public enum Situation
         {
             AwaitToRollTheDice,
-            DiceIsRolling,
             AwaitForReaction
         }
 

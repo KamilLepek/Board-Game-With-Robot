@@ -40,12 +40,7 @@ namespace BoardGameWithRobot.Map
         public void SetImage(Mat image)
         {
             this.Image?.Dispose();
-            Mat temp = image.Clone();
-            var regionOfInterest = new Rectangle(this.Center.X - this.Radius,
-                this.Center.Y - this.Radius, 2 * this.Radius, 2 * this.Radius);
-            Image<Rgb, Byte> img = temp.ToImage<Rgb, Byte>();
-            img.ROI = regionOfInterest;
-            this.Image = img;
+            this.Image = SimpleImageProcessingServices.CutFragmentOfImage(image, this.Center, this.Radius);
         }
 
         /// <summary>

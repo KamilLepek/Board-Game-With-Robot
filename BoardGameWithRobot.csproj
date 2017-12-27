@@ -69,8 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\GameController.cs" />
+    <Compile Include="ImageProcessing\DiceDetectingService.cs" />
     <Compile Include="ImageProcessing\Initializator.cs" />
-    <Compile Include="Controllers\SituationController.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Utilities\DrawingService.cs" />
     <Compile Include="ImageProcessing\StaticServices\SimpleImageProcessingServices.cs" />
