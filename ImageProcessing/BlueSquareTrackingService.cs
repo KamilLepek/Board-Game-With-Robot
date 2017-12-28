@@ -31,12 +31,15 @@ namespace BoardGameWithRobot.ImageProcessing
                 VectorOfPoint approxCurve = SimpleImageProcessingServices.ApproximateCurve(curves[i]);
 
                 // ignore if curve is relatively small or not convex
-                if (SimpleImageProcessingServices.IsCurveSmallEnoughToBeIgnored(approxCurve) ||
+                if (!SimpleImageProcessingServices.IsCurveSizeBetweenMargins(
+                    approxCurve, 
+                    Constants.BlueTrackerCurveSizeIgnoringMargin, 
+                    Constants.DefaultCurveSizeIgnoringMargin) ||
                     !CvInvoke.IsContourConvex(approxCurve))
                     continue;
 
                 // Check if it is blue square
-                if (approxCurve.Size == 4 &&
+                if (SimpleImageProcessingServices.IsSquare(this.cameraService.ActualFrame, approxCurve) &&
                     this.IsSquareBlue(this.cameraService.ActualFrame, FilteringServices.BGRToHSV(this.cameraService.ActualFrame), approxCurve))
                 {
                     this.AddTrackerIfNecessary(approxCurve);

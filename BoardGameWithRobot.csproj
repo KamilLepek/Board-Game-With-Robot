@@ -70,8 +70,10 @@
   <ItemGroup>
     <Compile Include="Controllers\GameController.cs" />
     <Compile Include="ImageProcessing\DiceDetectingService.cs" />
+    <Compile Include="ImageProcessing\FieldsDetectingService.cs" />
     <Compile Include="ImageProcessing\Initializator.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Map\Field.cs" />
     <Compile Include="Utilities\DrawingService.cs" />
     <Compile Include="ImageProcessing\StaticServices\SimpleImageProcessingServices.cs" />
     <Compile Include="Map\Board.cs" />

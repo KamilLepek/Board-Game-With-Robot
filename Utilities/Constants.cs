@@ -22,7 +22,6 @@ namespace BoardGameWithRobot.Utilities
 
         #region Tracker constants
 
-        public const int TrackerDistanceDifferenceFromLastPosition = 4;
         public const int NumberOfTrackers = 4;
         public const int MinimumNumberOfActiveTrackers = 3;
 
@@ -31,16 +30,19 @@ namespace BoardGameWithRobot.Utilities
         /// </summary>
         public const int BlueTrackerRadiusMargin = 100;
 
-        public const int AmountOfInitFramesToSearchForTrackers = 10;
+        public const int AmountOfInitFramesToSearchForTrackers = 20;
         public const int MaxFrameAmountTrackerNotDetectedToDelete = 50;
 
         #endregion
+
+        public const int DistanceFromLastPositionIgnoringMargin = 5;
 
         public const int MessageFramesDuration = Int32.MaxValue;
         public const int BlueHueBottomConstraint = 199;
         public const int BlueHueTopConstraint = 240;
         public const double ColorRadiusDetectingFactor = 0.8;
         public const int DefaultCurveSizeIgnoringMargin = 2000;
+        public const int BlueTrackerCurveSizeIgnoringMargin = 5000;
         public const double CurveDetectingFactor = 0.02;
         public const int CameraId = 1;
         public const string WindowName = "Board Game";
@@ -56,6 +58,11 @@ namespace BoardGameWithRobot.Utilities
         public const int DiceResizingFactor = 10;
         public const int DiceRollingPipsMargin = 5;
         public const int IgnoredDistanceBetweenPips = 5;
+
+
+        public const int AmountOfInitFramesToSearchForFields = 10;
+        public const int NumberOfFields = 20;
+        public const int FieldSizeIgnoringMargin = 10000;
 
         public const string Quality = "FHD"; //FHD, HD, 480
     }

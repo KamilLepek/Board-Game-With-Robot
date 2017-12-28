@@ -13,13 +13,16 @@ namespace BoardGameWithRobot.ImageProcessing
 
         private readonly BlueSquareTrackingService blueSquareTrackingService;
 
+        private readonly FieldsDetectingService fieldsDetectingService;
+
         private readonly Board board;
 
-        public Initializator(CameraService camera, BlueSquareTrackingService blueSquareTracking, Board b)
+        public Initializator(CameraService camera, BlueSquareTrackingService blueSquareTracking, FieldsDetectingService fieldService, Board b)
         {
             this.board = b;
             this.cameraService = camera;
             this.blueSquareTrackingService = blueSquareTracking;
+            this.fieldsDetectingService = fieldService;
         }
 
         /// <summary>
@@ -30,15 +33,40 @@ namespace BoardGameWithRobot.ImageProcessing
         {
             if (!this.DetectTrackersOnInit()) 
             {
-                Console.WriteLine("Board initialization failed.");
+                Console.WriteLine("Trackers initialization failed.");
                 return false;
             }
+            if (!this.DetectFieldsOnInit())
+            {
+                Console.WriteLine("Fields initialization failed.");
+                return false;
+            }  
             return true;
         }
 
         public bool InitializeRobot()
         {
             return true;
+        }
+
+        public bool DetectFieldsOnInit()
+        {
+            for (int i = 0; i < Constants.AmountOfInitFramesToSearchForFields; i++)
+            {
+                this.cameraService.GetCameraFrame();
+                this.fieldsDetectingService.DetectFieldsOnInit();
+                this.cameraService.ShowFrame();
+            }
+            if (this.board.FieldsList.Count == Constants.NumberOfFields)
+            {
+                foreach (var field in this.board.FieldsList)
+                {
+                    this.board.SetFieldLabel(field);
+                }
+                return true;
+            }
+            Console.WriteLine("{0} fields detected instead of {1}", this.board.FieldsList.Count, Constants.NumberOfFields);
+            return false;
         }
 
         /// <summary>

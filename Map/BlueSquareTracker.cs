@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using BoardGameWithRobot.ImageProcessing;
 using BoardGameWithRobot.Utilities;
 using Emgu.CV;
@@ -34,7 +33,7 @@ namespace BoardGameWithRobot.Map
         public void PrintTracker(Mat image)
         {
             int manhattanRadius = (int)(this.Radius / Math.Sqrt(2));
-            DrawingService.PutSquareOnBoard(image, this.Center, manhattanRadius);
+            DrawingService.PutSquareOnBoard(image, this.Center, manhattanRadius, true);
         }
 
         public void SetImage(Mat image)

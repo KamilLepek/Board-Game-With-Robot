@@ -67,6 +67,20 @@ namespace BoardGameWithRobot.ImageProcessing
             return 2 * color / ((2 * radius + 1) * (2 * radius + 1));
         }
 
+        public static bool IsSquare(Mat image, VectorOfPoint curve)
+        {
+            Point massCenter = GeometryUtilis.MassCenter(curve);
+            int radius = (int)(GeometryUtilis.CalculateSquareRadius(curve, massCenter) * Constants.ColorRadiusDetectingFactor);
+            if (radius > Constants.BlueTrackerRadiusMargin)
+                return false;
+            if (massCenter.Y - radius < 0 || massCenter.X - radius < 0 || massCenter.Y + radius > image.Height ||
+                massCenter.X + radius > image.Width)
+                return false;
+            if (curve.Size == 4)
+                return true;
+            return false;
+        }
+
         /// <summary>
         /// Determines whether hue in given square is between given constraints.
         /// Coinstraints can either determine [bottom,top] or [0,top]u[bottom,360] intervals
@@ -86,11 +100,6 @@ namespace BoardGameWithRobot.ImageProcessing
         {
             Point massCenter = GeometryUtilis.MassCenter(approxCurve);
             int radius = (int)(GeometryUtilis.CalculateSquareRadius(approxCurve, massCenter) * Constants.ColorRadiusDetectingFactor);
-            if (radius > Constants.BlueTrackerRadiusMargin)
-                return false;
-            if (massCenter.Y - radius < 0 || massCenter.X - radius < 0 || massCenter.Y + radius > HSV.Height ||
-                massCenter.X + radius > HSV.Width)
-                return false;
             int color = ApproximateColorInSquare(HSV, massCenter, radius);
 #if DEBUG
             DrawingService.PutTextOnMassCenterOfCurve(image, approxCurve, color.ToString());

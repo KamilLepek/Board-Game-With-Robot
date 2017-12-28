@@ -8,7 +8,7 @@
             AwaitForReaction
         }
 
-        public enum Turn
+        public enum Player
         {
             Human,
             Robot

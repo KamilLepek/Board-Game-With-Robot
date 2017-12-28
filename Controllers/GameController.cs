@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using BoardGameWithRobot.ImageProcessing;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
-using Emgu.CV;
 
 namespace BoardGameWithRobot.Controllers
 {
@@ -23,9 +22,11 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly DiceDetectingService diceDetectingService;
 
+        private readonly FieldsDetectingService fieldsDetectingService;
+
         private Enums.Situation situation;
 
-        private Enums.Turn turn;
+        private Enums.Player player;
 
         private readonly Board board;
 
@@ -38,7 +39,8 @@ namespace BoardGameWithRobot.Controllers
             this.board = new Board();
             this.cameraService = new CameraService();
             this.blueSquareTrackingService = new BlueSquareTrackingService(this.cameraService, this.board);
-            this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService, this.board);
+            this.fieldsDetectingService = new FieldsDetectingService(this.cameraService, this.board);
+            this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService, this.fieldsDetectingService, this.board);
             this.diceDetectingService = new DiceDetectingService(this.cameraService);
         }
 
@@ -55,7 +57,7 @@ namespace BoardGameWithRobot.Controllers
             if (!this.initializator.InitializeRobot())
                 return false;
             this.situation = Enums.Situation.AwaitToRollTheDice;
-            this.turn = Enums.Turn.Human;
+            this.player = Enums.Player.Human;
             return true;
         }
 
@@ -104,6 +106,7 @@ namespace BoardGameWithRobot.Controllers
         private void DisplayElementsOnBoard()
         {
             this.board.PrintTrackersOnImage(this.cameraService.ActualFrame);
+            this.board.PrintFieldsOnBoard(this.cameraService.ActualFrame);
         }
 
         /// <summary>
@@ -115,11 +118,11 @@ namespace BoardGameWithRobot.Controllers
             switch (this.situation)
             {
                 case Enums.Situation.AwaitToRollTheDice:
-                    MessageLogger.LogMessage(string.Format("{0} turn. Roll the dice!", this.turn.ToString()));
+                    MessageLogger.LogMessage(string.Format("{0} turn. Roll the dice!", this.player.ToString()));
                     this.ChangeStateUponDiceDetection();
                     break;
                 case Enums.Situation.AwaitForReaction:
-                    MessageLogger.LogMessage(string.Format("{0} turn. Move {1} squares!", this.turn.ToString(), this.dicePipsNumber));
+                    MessageLogger.LogMessage(string.Format("{0} turn. Move {1} squares!", this.player.ToString(), this.dicePipsNumber));
                     if (false)//validate that player has finished his movement!
                     {
                         this.situation = Enums.Situation.AwaitToRollTheDice;
@@ -158,10 +161,10 @@ namespace BoardGameWithRobot.Controllers
 
         private void ChangeTurn()
         {
-            if (this.turn == Enums.Turn.Human)
-                this.turn = Enums.Turn.Robot;
-            else if (this.turn == Enums.Turn.Robot)
-                this.turn = Enums.Turn.Human;
+            if (this.player == Enums.Player.Human)
+                this.player = Enums.Player.Robot;
+            else if (this.player == Enums.Player.Robot)
+                this.player = Enums.Player.Human;
             else
                 throw new ArgumentOutOfRangeException();
         }
