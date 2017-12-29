@@ -1,17 +1,12 @@
-﻿
-using System.Drawing;
-using BoardGameWithRobot.Map;
+﻿using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
-using Emgu.CV;
-using Emgu.CV.Util;
 
 namespace BoardGameWithRobot.ImageProcessing
 {
     internal class GamePawnsDetectingService
     {
-        private readonly CameraService cameraService;
-
         private readonly Board board;
+        private readonly CameraService cameraService;
 
 
         public GamePawnsDetectingService(CameraService cam, Board b)
@@ -22,45 +17,42 @@ namespace BoardGameWithRobot.ImageProcessing
 
         public void DetectPawnsOnInit()
         {
-            VectorOfVectorOfPoint curves =
+            var curves =
                 SimpleImageProcessingServices.DetectEdgesAsCurvesOnImage(this.cameraService.ActualFrame);
             for (int i = 0; i < curves.Size; i++)
             {
-                VectorOfPoint approxCurve = SimpleImageProcessingServices.ApproximateCurve(curves[i]);
-
-                Point massCntr = GeometryUtilis.MassCenter(approxCurve);
-                int r = GeometryUtilis.CalculateSquareRadius(approxCurve, massCntr);
+                var boundary = new SquareBoundsCurve(SimpleImageProcessingServices.ApproximateCurve(curves[i]));
 
                 // ignore if curve is relatively small or not convex
                 if (!SimpleImageProcessingServices.IsCurveSizeBetweenMargins(
-                        approxCurve, Constants.PawnContourSizeTopConstraint,
+                        boundary.Curve, Constants.PawnContourSizeTopConstraint,
                         Constants.PawnContourSizeBottomConstraint) ||
-                    r > 40 || (GeometryUtilis.DistanceBetweenPoints(massCntr,
-                                   this.board.FieldsList.Find(v => v.Label == "H1").Center) >
-                               Constants.PawnDistanceFromFieldMargin &&
-                               GeometryUtilis.DistanceBetweenPoints(massCntr,
-                                   this.board.FieldsList.Find(v => v.Label == "R1").Center) >
-                               Constants.PawnDistanceFromFieldMargin))
+                    boundary.Radius > 40 || GeometryUtilis.DistanceBetweenPoints(boundary.MassCenter,
+                        this.board.FieldsList.Find(v => v.Label == "H1").Boundary.MassCenter) >
+                    Constants.PawnDistanceFromFieldMargin &&
+                    GeometryUtilis.DistanceBetweenPoints(boundary.MassCenter,
+                        this.board.FieldsList.Find(v => v.Label == "R1").Boundary.MassCenter) >
+                    Constants.PawnDistanceFromFieldMargin)
                     continue;
 #if DEBUG
-                DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, massCntr, r);
+                DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, boundary);
 #endif
-                this.AddPawnsIfNecessary(approxCurve);
+                this.AddPawnsIfNecessary(boundary);
             }
         }
 
-        private void AddPawnsIfNecessary(VectorOfPoint curve)
+        private void AddPawnsIfNecessary(SquareBoundsCurve boundary)
         {
-            if (!this.board.LookForPawnOnInit(GeometryUtilis.MassCenter(curve)))
+            if (!this.board.LookForPawnOnInit(boundary.MassCenter))
             {
-                Enums.Player player =
-                    GeometryUtilis.DistanceBetweenPoints(GeometryUtilis.MassCenter(curve),
-                        this.board.FieldsList.Find(v => v.Label == "H1").Center) <
-                    GeometryUtilis.DistanceBetweenPoints(GeometryUtilis.MassCenter(curve),
-                        this.board.FieldsList.Find(v => v.Label == "R1").Center)
+                var player =
+                    GeometryUtilis.DistanceBetweenPoints(boundary.MassCenter,
+                        this.board.FieldsList.Find(v => v.Label == "H1").Boundary.MassCenter) <
+                    GeometryUtilis.DistanceBetweenPoints(boundary.MassCenter,
+                        this.board.FieldsList.Find(v => v.Label == "R1").Boundary.MassCenter)
                         ? Enums.Player.Human
                         : Enums.Player.Robot;
-                GamePawn pawn = new GamePawn(curve, player);
+                var pawn = new GamePawn(boundary, player);
                 this.board.PawnsList.Add(pawn);
             }
         }

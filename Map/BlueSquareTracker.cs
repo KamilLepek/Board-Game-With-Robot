@@ -16,11 +16,11 @@ namespace BoardGameWithRobot.Map
         /// <summary>
         /// Part of the camera input on which we search for the tracker to determine whether camera has moved
         /// </summary>
-        public Image<Rgb, byte> Image { get; set; }
+        private Image<Rgb, byte> image;
 
         public Enums.TrackerDetectionState State { get; set; }
 
-        public BlueSquareTracker(VectorOfPoint curve, BlueSquareTrackingService blueSquareTracking) : base(curve)
+        public BlueSquareTracker(SquareBoundsCurve boundary, BlueSquareTrackingService blueSquareTracking) : base(boundary)
         {
             this.blueSquareTrackingService = blueSquareTracking;
             this.FramesSinceDetected = 0;
@@ -30,16 +30,15 @@ namespace BoardGameWithRobot.Map
         /// <summary>
         /// Prints square on tracker on the image
         /// </summary>
-        public void PrintTracker(Mat image)
+        public void PrintTracker(Mat img)
         {
-            int manhattanRadius = (int)(this.Radius / Math.Sqrt(2));
-            DrawingService.PutSquareOnBoard(image, this.Center, manhattanRadius, true);
+            DrawingService.PutSquareOnBoard(img, this.Boundary, true, 1/Math.Sqrt(2));
         }
 
-        public void SetImage(Mat image)
+        public void SetImage(Mat img)
         {
-            this.Image?.Dispose();
-            this.Image = SimpleImageProcessingServices.CutFragmentOfImage(image, this.Center, this.Radius);
+            this.image?.Dispose();
+            this.image = SimpleImageProcessingServices.CutFragmentOfImage(img, this.Boundary);
         }
 
         /// <summary>
@@ -47,17 +46,17 @@ namespace BoardGameWithRobot.Map
         /// </summary>
         public void SearchForTracker()
         {
-            VectorOfVectorOfPoint curves = SimpleImageProcessingServices.DetectEdgesAsCurvesOnImage(this.Image.Mat);
+            VectorOfVectorOfPoint curves = SimpleImageProcessingServices.DetectEdgesAsCurvesOnImage(this.image.Mat);
 
             for (int i = 0; i < curves.Size; i++)
             {
-                VectorOfPoint approxCurve = SimpleImageProcessingServices.ApproximateCurve(curves[i]);
+                SquareBoundsCurve boundary = new SquareBoundsCurve(SimpleImageProcessingServices.ApproximateCurve(curves[i]));
                 // ignore if curve is relatively small or not convex
-                if (SimpleImageProcessingServices.IsCurveSmallEnoughToBeIgnored(approxCurve) ||
-                    !CvInvoke.IsContourConvex(approxCurve))
+                if (SimpleImageProcessingServices.IsCurveSmallEnoughToBeIgnored(boundary.Curve) ||
+                    !CvInvoke.IsContourConvex(boundary.Curve))
                     continue;
-                if (approxCurve.Size == 4 
-                    && this.blueSquareTrackingService.IsSquareBlue(this.Image.Mat, FilteringServices.BGRToHSV(this.Image.Mat), approxCurve))
+                if (boundary.Curve.Size == 4 
+                    && this.blueSquareTrackingService.IsSquareBlue(this.image.Mat, FilteringServices.BGRToHSV(this.image.Mat), boundary))
                     this.UpdateParamsOnDetection();
             }
         }

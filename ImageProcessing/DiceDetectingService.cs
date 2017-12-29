@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
+using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
@@ -13,17 +13,11 @@ namespace BoardGameWithRobot.ImageProcessing
     {
         private readonly CameraService cameraService;
 
-        private Point massCenter;
-
-        private int radius;
-
-        public bool IsDiceRegionDefined { get; set; }
-
-        public Image<Rgb, byte> Image { get; set; }
-
         private List<Point> pips;
 
-        private int rollingFramesCounter = 0;
+        private int rollingFramesCounter;
+
+        private SquareBoundsCurve squareBounds;
 
         public DiceDetectingService(CameraService camera)
         {
@@ -32,79 +26,77 @@ namespace BoardGameWithRobot.ImageProcessing
             this.pips = new List<Point>();
         }
 
+        public bool IsDiceRegionDefined { get; set; }
+
+        public Image<Rgb, byte> Image { get; set; }
+
         public bool DetectDice()
         {
-            VectorOfVectorOfPoint curves =
+            var curves =
                 SimpleImageProcessingServices.DetectEdgesAsCurvesOnImage(this.cameraService.ActualFrame);
             for (int i = 0; i < curves.Size; i++)
             {
-                VectorOfPoint approxCurve = SimpleImageProcessingServices.ApproximateCurve(curves[i]);
-
-                Point massCntr = GeometryUtilis.MassCenter(approxCurve);
-                int r = GeometryUtilis.CalculateSquareRadius(approxCurve, massCntr);
+                var boundary = new SquareBoundsCurve(SimpleImageProcessingServices.ApproximateCurve(curves[i]));
 
                 // ignore if curve is relatively small or not convex
                 if (!SimpleImageProcessingServices.IsCurveSizeBetweenMargins(
-                    approxCurve, Constants.DiceContourSizeTopConstraint, Constants.DiceContourSizeBottomConstraint) ||
-                    !CvInvoke.IsContourConvex(approxCurve) ||
-                    r > Constants.DiceSquareRadiusConstraint)
+                        boundary.Curve, Constants.DiceContourSizeTopConstraint,
+                        Constants.DiceContourSizeBottomConstraint) ||
+                    !CvInvoke.IsContourConvex(boundary.Curve) ||
+                    boundary.Radius > Constants.DiceSquareRadiusConstraint)
                     continue;
-                this.DefineDiceRegion(massCntr, r);
-#if DEBUG
-                DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, this.massCenter, this.radius);
-#endif
+                this.DefineDiceRegion(boundary);
+                DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, this.squareBounds, true);
                 this.DetectRolledNumber();
                 return true;
             }
             return false;
         }
 
-        private void DefineDiceRegion(Point center, int r)
+        private void DefineDiceRegion(SquareBoundsCurve boundary)
         {
-            if (!this.IsDiceRegionDefined || GeometryUtilis.DistanceBetweenPoints(this.massCenter, center) > 5)
+            if (!this.IsDiceRegionDefined ||
+                GeometryUtilis.DistanceBetweenPoints(this.squareBounds.MassCenter, boundary.MassCenter) >
+                Constants.DistanceFromLastPositionIgnoringMargin)
             {
-                this.massCenter = center;
-                this.radius = r;
+                this.squareBounds = boundary;
                 this.IsDiceRegionDefined = true;
             }
             this.Image?.Dispose();
             this.Image =
                 SimpleImageProcessingServices.CutFragmentOfImage(
-                    this.cameraService.ActualFrame, 
-                    this.massCenter, 
-                    this.radius);
+                    this.cameraService.ActualFrame,
+                    this.squareBounds);
         }
 
         private void DetectRolledNumber()
         {
-            Mat resized = this.Image.Mat.Clone();
-            CvInvoke.Resize(this.Image.Mat, resized, Size.Empty, Constants.DiceResizingFactor, Constants.DiceResizingFactor);
+            var resized = this.Image.Mat.Clone();
+            CvInvoke.Resize(this.Image.Mat, resized, Size.Empty, Constants.DiceResizingFactor,
+                Constants.DiceResizingFactor);
 
-            Mat binary = FilteringServices.BgrToBinary(resized, Constants.DiceBinaryPoint);
-            Mat canniedBinary = binary.Clone();
+            var binary = FilteringServices.BgrToBinary(resized, Constants.DiceBinaryPoint);
+            var canniedBinary = binary.Clone();
             CvInvoke.Canny(binary, canniedBinary, Constants.ThresholdLow, Constants.ThresholdHigh, Constants.Aperture);
-            
-            VectorOfVectorOfPoint curves = new VectorOfVectorOfPoint();
+
+            var curves = new VectorOfVectorOfPoint();
             CvInvoke.FindContours(canniedBinary, curves, new Mat(), RetrType.Tree, ChainApproxMethod.ChainApproxSimple);
 
             this.rollingFramesCounter++;
 
             for (int i = 0; i < curves.Size; i++)
             {
-                VectorOfPoint approxCurve = SimpleImageProcessingServices.ApproximateCurve(curves[i]);
-
-                Point massCntr = GeometryUtilis.MassCenter(approxCurve);
-                int r = GeometryUtilis.CalculateSquareRadius(approxCurve, massCntr);
+                var boundary = new SquareBoundsCurve(SimpleImageProcessingServices.ApproximateCurve(curves[i]));
 
                 //ignore if curve is relatively small or not convex
                 if (!SimpleImageProcessingServices.IsCurveSizeBetweenMargins(
-                        approxCurve, Constants.DicePipTopSizeConstraint, Constants.DicePipBottomSizeConstraint) ||
-                    !CvInvoke.IsContourConvex(approxCurve) ||
-                    r > Constants.DiceSquareRadiusConstraint)
+                        boundary.Curve, Constants.DicePipTopSizeConstraint, Constants.DicePipBottomSizeConstraint) ||
+                    !CvInvoke.IsContourConvex(boundary.Curve) ||
+                    boundary.Radius > Constants.DiceSquareRadiusConstraint)
                     continue;
-                this.AddToPipListIfNecessary(massCntr);
+                this.AddToPipListIfNecessary(boundary.MassCenter);
 #if DEBUG
-                DrawingService.PutSquareOnBoard(resized, massCntr, r);
+                DrawingService.PutSquareOnBoard(resized, boundary);
 #endif
             }
 
@@ -120,10 +112,8 @@ namespace BoardGameWithRobot.ImageProcessing
             if (this.rollingFramesCounter > Constants.DiceRollingPipsMargin)
             {
                 foreach (var pip in this.pips)
-                {
                     if (GeometryUtilis.DistanceBetweenPoints(center, pip) < Constants.IgnoredDistanceBetweenPips)
                         return;
-                }
                 this.pips.Add(center);
             }
         }

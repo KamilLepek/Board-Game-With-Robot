@@ -9,12 +9,6 @@ namespace BoardGameWithRobot.Map
 {
     internal class Board
     {
-        public List<BlueSquareTracker> TrackersList { get; }
-
-        public List<Field> FieldsList { get; }
-
-        public List<GamePawn> PawnsList { get; }
-
         public Board()
         {
             this.TrackersList = new List<BlueSquareTracker>();
@@ -22,16 +16,20 @@ namespace BoardGameWithRobot.Map
             this.PawnsList = new List<GamePawn>();
         }
 
+        public List<BlueSquareTracker> TrackersList { get; }
+
+        public List<Field> FieldsList { get; }
+
+        public List<GamePawn> PawnsList { get; }
+
         public bool LookForPawnOnInit(Point position)
         {
             if (!this.PawnsList.Any())
                 return false;
             foreach (var pawn in this.PawnsList)
-            {
-                if (GeometryUtilis.DistanceBetweenPoints(pawn.Center, position) <
+                if (GeometryUtilis.DistanceBetweenPoints(pawn.Boundary.MassCenter, position) <
                     Constants.DistanceFromLastPositionIgnoringMargin)
                     return true;
-            }
             return false;
         }
 
@@ -40,11 +38,9 @@ namespace BoardGameWithRobot.Map
             if (!this.FieldsList.Any())
                 return false;
             foreach (var field in this.FieldsList)
-            {
-                if (GeometryUtilis.DistanceBetweenPoints(field.Center, position) <
+                if (GeometryUtilis.DistanceBetweenPoints(field.Boundary.MassCenter, position) <
                     Constants.DistanceFromLastPositionIgnoringMargin)
                     return true;
-            }
             return false;
         }
 
@@ -54,13 +50,15 @@ namespace BoardGameWithRobot.Map
             string result;
             if (field.Player == Enums.Player.Human)
             {
-                sortedFieldList = this.FieldsList.Where(v => v.Player == Enums.Player.Human).OrderBy(v => v.Center.X)
+                sortedFieldList = this.FieldsList.Where(v => v.Player == Enums.Player.Human)
+                    .OrderBy(v => v.Boundary.MassCenter.X)
                     .ToList();
                 result = "H";
             }
             else
             {
-                sortedFieldList = this.FieldsList.Where(v => v.Player == Enums.Player.Robot).OrderBy(v => v.Center.X)
+                sortedFieldList = this.FieldsList.Where(v => v.Player == Enums.Player.Robot)
+                    .OrderBy(v => v.Boundary.MassCenter.X)
                     .ToList();
                 result = "R";
             }
@@ -70,7 +68,7 @@ namespace BoardGameWithRobot.Map
         }
 
         /// <summary>
-        /// Looks for tracker with specified position
+        ///     Looks for tracker with specified position
         /// </summary>
         /// <param name="position">given position</param>
         /// <returns>Returns true if any tracker is found nearby</returns>
@@ -79,14 +77,12 @@ namespace BoardGameWithRobot.Map
             if (!this.TrackersList.Any())
                 return false;
             foreach (var tracker in this.TrackersList)
-            {
-                if (GeometryUtilis.DistanceBetweenPoints(tracker.Center, position) <
+                if (GeometryUtilis.DistanceBetweenPoints(tracker.Boundary.MassCenter, position) <
                     Constants.DistanceFromLastPositionIgnoringMargin)
                 {
                     tracker.UpdateParamsOnDetection();
                     return true;
                 }
-            }
             return false;
         }
 
@@ -95,34 +91,24 @@ namespace BoardGameWithRobot.Map
             if (!this.TrackersList.Any())
                 throw new Exception("Empty trackers list!");
             foreach (var blueSquareTracker in this.TrackersList)
-            {
                 blueSquareTracker.PrintTracker(image);
-            }
         }
 
         public Point DetermineTopLeftCornerOfTrackersListRectangle()
         {
-            Point p = new Point(Int32.MaxValue, Int32.MaxValue);
+            var p = new Point(int.MaxValue, int.MaxValue);
             foreach (var blueSquareTracker in this.TrackersList)
-            {
-                if (blueSquareTracker.Center.X + blueSquareTracker.Center.Y < p.X + p.Y)
-                {
-                    p = blueSquareTracker.Center;
-                }
-            }
+                if (blueSquareTracker.Boundary.MassCenter.X + blueSquareTracker.Boundary.MassCenter.Y < p.X + p.Y)
+                    p = blueSquareTracker.Boundary.MassCenter;
             return p;
         }
 
         public Point DetermineBottomRightCornerOfTrackersListRectangle()
         {
-            Point p = new Point(0, 0);
+            var p = new Point(0, 0);
             foreach (var blueSquareTracker in this.TrackersList)
-            {
-                if (blueSquareTracker.Center.X + blueSquareTracker.Center.Y > p.X + p.Y)
-                {
-                    p = blueSquareTracker.Center;
-                }
-            }
+                if (blueSquareTracker.Boundary.MassCenter.X + blueSquareTracker.Boundary.MassCenter.Y > p.X + p.Y)
+                    p = blueSquareTracker.Boundary.MassCenter;
             return p;
         }
 
@@ -131,9 +117,7 @@ namespace BoardGameWithRobot.Map
             if (this.FieldsList.Count != Constants.NumberOfFields)
                 throw new ArgumentOutOfRangeException();
             foreach (var field in this.FieldsList)
-            {
                 field.Print(image);
-            }
         }
     }
 }

@@ -2,16 +2,16 @@
 {
     internal class Enums
     {
-        public enum Situation
-        {
-            AwaitToRollTheDice,
-            AwaitForReaction
-        }
-
         public enum Player
         {
             Human,
             Robot
+        }
+
+        public enum Situation
+        {
+            AwaitToRollTheDice,
+            AwaitForReaction
         }
 
         public enum TrackerDetectionState

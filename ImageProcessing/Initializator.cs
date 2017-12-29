@@ -5,19 +5,19 @@ using BoardGameWithRobot.Utilities;
 namespace BoardGameWithRobot.ImageProcessing
 {
     /// <summary>
-    /// Class used for image processing operations for initialization
+    ///     Class used for image processing operations for initialization
     /// </summary>
     internal class Initializator
     {
-        private readonly CameraService cameraService;
-
         private readonly BlueSquareTrackingService blueSquareTrackingService;
+
+        private readonly Board board;
+
+        private readonly CameraService cameraService;
 
         private readonly FieldsDetectingService fieldsDetectingService;
 
         private readonly GamePawnsDetectingService gamePawnsDetectingService;
-
-        private readonly Board board;
 
         public Initializator(CameraService camera, BlueSquareTrackingService blueSquareTracking,
             FieldsDetectingService fieldService, GamePawnsDetectingService gamePawnsService, Board b)
@@ -30,12 +30,12 @@ namespace BoardGameWithRobot.ImageProcessing
         }
 
         /// <summary>
-        /// Initializes board related(visual) elements
+        ///     Initializes board related(visual) elements
         /// </summary>
         /// <returns>returns true if starting the game is not forbidden</returns>
         public bool InitializeBoard()
         {
-            if (!this.DetectTrackersOnInit()) 
+            if (!this.DetectTrackersOnInit())
             {
                 Console.WriteLine("Trackers initialization failed. Trying again...");
                 if (!this.DetectTrackersOnInit())
@@ -61,7 +61,6 @@ namespace BoardGameWithRobot.ImageProcessing
             return true;
         }
 
-        
         public bool InitializeRobot()
         {
             return true;
@@ -76,9 +75,7 @@ namespace BoardGameWithRobot.ImageProcessing
                 this.cameraService.ShowFrame();
             }
             if (this.board.PawnsList.Count == Constants.NumberOfPawns)
-            {
                 return true;
-            }
             Console.WriteLine("{0} pawns detected instead of {1}", this.board.PawnsList.Count, Constants.NumberOfPawns);
             return false;
         }
@@ -94,17 +91,16 @@ namespace BoardGameWithRobot.ImageProcessing
             if (this.board.FieldsList.Count == Constants.NumberOfFields)
             {
                 foreach (var field in this.board.FieldsList)
-                {
                     this.board.SetFieldLabel(field);
-                }
                 return true;
             }
-            Console.WriteLine("{0} fields detected instead of {1}", this.board.FieldsList.Count, Constants.NumberOfFields);
+            Console.WriteLine("{0} fields detected instead of {1}", this.board.FieldsList.Count,
+                Constants.NumberOfFields);
             return false;
         }
 
         /// <summary>
-        /// Detects blue square trackers on start
+        ///     Detects blue square trackers on start
         /// </summary>
         /// <returns>true if tracker detected</returns>
         public bool DetectTrackersOnInit()
@@ -117,7 +113,8 @@ namespace BoardGameWithRobot.ImageProcessing
             }
             if (this.board.TrackersList.Count == Constants.NumberOfTrackers)
                 return true;
-            Console.WriteLine("{0} trackers detected instead of {1}", this.board.TrackersList.Count, Constants.NumberOfTrackers);
+            Console.WriteLine("{0} trackers detected instead of {1}", this.board.TrackersList.Count,
+                Constants.NumberOfTrackers);
             return false;
         }
     }

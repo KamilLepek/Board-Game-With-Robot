@@ -8,17 +8,15 @@ using BoardGameWithRobot.Utilities;
 namespace BoardGameWithRobot.Controllers
 {
     /// <summary>
-    /// Main controller of the application
+    ///     Main controller of the application
     /// </summary>
     internal class GameController
     {
-        private readonly CameraService cameraService;
-
-        private readonly Initializator initializator;
-
-        private readonly Stopwatch timer = new Stopwatch();
-
         private readonly BlueSquareTrackingService blueSquareTrackingService;
+
+        private readonly Board board;
+
+        private readonly CameraService cameraService;
 
         private readonly DiceDetectingService diceDetectingService;
 
@@ -26,15 +24,17 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly GamePawnsDetectingService gamePawnsDetectingService;
 
-        private Enums.Situation situation;
+        private readonly Initializator initializator;
+
+        private readonly Stopwatch timer = new Stopwatch();
+
+        private int diceDetectionFrames;
+
+        private int dicePipsNumber;
 
         private Enums.Player player;
 
-        private readonly Board board;
-
-        private int diceDetectionFrames = 0;
-
-        private int dicePipsNumber = 0;
+        private Enums.Situation situation;
 
         public GameController()
         {
@@ -43,12 +43,13 @@ namespace BoardGameWithRobot.Controllers
             this.blueSquareTrackingService = new BlueSquareTrackingService(this.cameraService, this.board);
             this.fieldsDetectingService = new FieldsDetectingService(this.cameraService, this.board);
             this.gamePawnsDetectingService = new GamePawnsDetectingService(this.cameraService, this.board);
-            this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService, this.fieldsDetectingService, this.gamePawnsDetectingService, this.board);
+            this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService,
+                this.fieldsDetectingService, this.gamePawnsDetectingService, this.board);
             this.diceDetectingService = new DiceDetectingService(this.cameraService);
         }
 
         /// <summary>
-        /// Initializes everything at the beginning
+        ///     Initializes everything at the beginning
         /// </summary>
         /// <returns>true if every step succeeded</returns>
         public bool InitializeGame()
@@ -66,7 +67,7 @@ namespace BoardGameWithRobot.Controllers
         }
 
         /// <summary>
-        /// Main loop of the game
+        ///     Main loop of the game
         /// </summary>
         public void PlayGame()
         {
@@ -77,7 +78,7 @@ namespace BoardGameWithRobot.Controllers
                 this.SetFragmentsOfImageForTrackersDetection();
 
                 //check if tracker is there where it should be
-                if (!this.blueSquareTrackingService.DetectTrackerInSquare())
+                if (!this.blueSquareTrackingService.DetectTrackersInTheirSquares())
                 {
                     MessageBox.Show("Trackers has been lost. Game is finished.");
                     return;
@@ -86,25 +87,22 @@ namespace BoardGameWithRobot.Controllers
                 this.AnalyzeAndChangeStateOfGame();
                 this.DisplayElementsOnBoard();
                 this.cameraService.ShowFrame();
-                Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " + (int)(1000 / this.timer.ElapsedMilliseconds) + " fps.");
+                Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " +
+                                  (int) (1000 / this.timer.ElapsedMilliseconds) + " fps.");
             }
         }
 
         private void SetFragmentsOfImageForTrackersDetection()
         {
             foreach (var blueSquareTracker in this.board.TrackersList)
-            {
                 blueSquareTracker.SetImage(this.cameraService.ActualFrame);
-            }
         }
 
         private void IncrementFramesAndCheckTrackersState()
         {
             foreach (var blueSquareTracker in this.board.TrackersList)
-            {
                 if (blueSquareTracker.FramesSinceDetected++ > Constants.MaxFrameAmountTrackerNotDetectedToDelete)
                     blueSquareTracker.State = Enums.TrackerDetectionState.Inactive;
-            }           
         }
 
         private void DisplayElementsOnBoard()
@@ -114,7 +112,7 @@ namespace BoardGameWithRobot.Controllers
         }
 
         /// <summary>
-        /// Analyzes and changes actual state of the game
+        ///     Analyzes and changes actual state of the game
         /// </summary>
         private void AnalyzeAndChangeStateOfGame()
         {
@@ -126,8 +124,9 @@ namespace BoardGameWithRobot.Controllers
                     this.ChangeStateUponDiceDetection();
                     break;
                 case Enums.Situation.AwaitForReaction:
-                    MessageLogger.LogMessage(string.Format("{0} turn. Move {1} squares!", this.player.ToString(), this.dicePipsNumber));
-                    if (false)//validate that player has finished his movement!
+                    MessageLogger.LogMessage(string.Format("{0} turn. Move {1} squares!", this.player.ToString(),
+                        this.dicePipsNumber));
+                    if (false) //validate that player has finished his movement!
                     {
                         this.situation = Enums.Situation.AwaitToRollTheDice;
                         this.ChangeTurn();
@@ -135,11 +134,11 @@ namespace BoardGameWithRobot.Controllers
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
-            } 
+            }
         }
 
         /// <summary>
-        /// Changes state if dice have been detected long enough to ensure that the result is not affected by movement
+        ///     Changes state if dice have been detected long enough to ensure that the result is not affected by movement
         /// </summary>
         private void ChangeStateUponDiceDetection()
         {
@@ -172,7 +171,5 @@ namespace BoardGameWithRobot.Controllers
             else
                 throw new ArgumentOutOfRangeException();
         }
-
-         
     }
 }

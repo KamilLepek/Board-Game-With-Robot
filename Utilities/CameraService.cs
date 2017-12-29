@@ -8,12 +8,12 @@ namespace BoardGameWithRobot.Utilities
     {
         private Capture cameraDevice;
 
-        public Mat ActualFrame { get; }
-
         public CameraService()
         {
             this.ActualFrame = new Mat();
         }
+
+        public Mat ActualFrame { get; }
 
         public bool InitializeCamera()
         {
@@ -58,7 +58,7 @@ namespace BoardGameWithRobot.Utilities
         }
 
         /// <summary>
-        /// Retrieves single frame from camera device
+        ///     Retrieves single frame from camera device
         /// </summary>
         /// <returns>Returns frame as matrix</returns>
         public void GetCameraFrame()
@@ -68,10 +68,10 @@ namespace BoardGameWithRobot.Utilities
         }
 
         /// <summary>
-        /// Prints image on window
+        ///     Prints image on window
         /// </summary>
         /// <param name="image">image to print</param>
-        /// <param name ="name">name of the window</param>
+        /// <param name="name">name of the window</param>
         public void ShowMatrix(Mat image, string name = Constants.WindowName)
         {
             CvInvoke.NamedWindow(name, NamedWindowType.FreeRatio);
@@ -80,7 +80,7 @@ namespace BoardGameWithRobot.Utilities
         }
 
         /// <summary>
-        /// Prints frame from camera on window
+        ///     Prints frame from camera on window
         /// </summary>
         public void ShowFrame()
         {

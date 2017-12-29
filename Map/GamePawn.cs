@@ -1,15 +1,14 @@
 ﻿using BoardGameWithRobot.Utilities;
-using Emgu.CV.Util;
 
 namespace BoardGameWithRobot.Map
 {
     internal class GamePawn : BoardObject
     {
-        public Enums.Player Player { get; }
-
-        public GamePawn(VectorOfPoint curve, Enums.Player pl) : base(curve)
+        public GamePawn(SquareBoundsCurve boundary, Enums.Player pl) : base(boundary)
         {
             this.Player = pl;
         }
+
+        public Enums.Player Player { get; }
     }
 }

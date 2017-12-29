@@ -1,15 +1,13 @@
 ﻿using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
 using Emgu.CV;
-using Emgu.CV.Util;
 
 namespace BoardGameWithRobot.ImageProcessing
 {
     internal class FieldsDetectingService
     {
-        private readonly CameraService cameraService;
-
         private readonly Board board;
+        private readonly CameraService cameraService;
 
         public FieldsDetectingService(CameraService cam, Board b)
         {
@@ -19,38 +17,33 @@ namespace BoardGameWithRobot.ImageProcessing
 
         public void DetectFieldsOnInit()
         {
-            VectorOfVectorOfPoint curves = SimpleImageProcessingServices.DetectEdgesAsCurvesOnImage(this.cameraService.ActualFrame);
+            var curves = SimpleImageProcessingServices.DetectEdgesAsCurvesOnImage(this.cameraService.ActualFrame);
             for (int i = 0; i < curves.Size; i++)
             {
-                VectorOfPoint approxCurve = SimpleImageProcessingServices.ApproximateCurve(curves[i]);
+                var boundary = new SquareBoundsCurve(SimpleImageProcessingServices.ApproximateCurve(curves[i]));
 
                 // ignore if curve is relatively small or not convex
-                if (SimpleImageProcessingServices.IsCurveSmallEnoughToBeIgnored(approxCurve, Constants.FieldSizeIgnoringMargin) ||
-                    !CvInvoke.IsContourConvex(approxCurve))
+                if (SimpleImageProcessingServices.IsCurveSmallEnoughToBeIgnored(boundary.Curve,
+                        Constants.FieldSizeIgnoringMargin) ||
+                    !CvInvoke.IsContourConvex(boundary.Curve))
                     continue;
 
                 // Check if it is big square
-                if (SimpleImageProcessingServices.IsSquare(this.cameraService.ActualFrame, approxCurve) &&
-                    !this.board.LookForTracker(GeometryUtilis.MassCenter(approxCurve)))
+                if (SimpleImageProcessingServices.IsSquare(this.cameraService.ActualFrame, boundary) &&
+                    !this.board.LookForTracker(boundary.MassCenter))
                 {
 #if DEBUG
-                    DrawingService.PutTextOnMassCenterOfCurve(this.cameraService.ActualFrame, approxCurve, "field");
+                    DrawingService.PutTextOnImage(this.cameraService.ActualFrame, boundary.MassCenter, "field");
 #endif
-                    this.AddFieldIfNecessary(approxCurve);
+                    this.AddFieldIfNecessary(boundary);
                 }
-                
             }
         }
 
-        private void AddFieldIfNecessary(VectorOfPoint approxCurve)
+        private void AddFieldIfNecessary(SquareBoundsCurve boundary)
         {
-            if (!this.board.LookForField(GeometryUtilis.MassCenter(approxCurve)))
-            {
-                Field f = new Field(approxCurve, this.cameraService.ActualFrame);
-                this.board.FieldsList.Add(f);
-            }
+            if (!this.board.LookForField(boundary.MassCenter))
+                this.board.FieldsList.Add(new Field(boundary, this.cameraService.ActualFrame));
         }
-
-        
     }
 }

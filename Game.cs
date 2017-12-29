@@ -2,14 +2,13 @@
 using BoardGameWithRobot.Controllers;
 using Emgu.CV;
 
-
 namespace BoardGameWithRobot
 {
     public class Game
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            GameController controller = new GameController();
+            var controller = new GameController();
 
             if (controller.InitializeGame())
             {

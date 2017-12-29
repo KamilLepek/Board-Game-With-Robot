@@ -1,14 +1,13 @@
 ﻿using System.Drawing;
-using System.Runtime.CompilerServices;
+using BoardGameWithRobot.Map;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
 
 namespace BoardGameWithRobot.Utilities
 {
     /// <summary>
-    /// Class which maintains drawing text and shapes on image
+    ///     Class which maintains drawing text and shapes on image
     /// </summary>
     internal static class DrawingService
     {
@@ -23,17 +22,15 @@ namespace BoardGameWithRobot.Utilities
                 new Bgr(0, 255, 0).MCvScalar);
         }
 
-        public static void PutTextOnMassCenterOfCurve(Mat image, VectorOfPoint approxCurve, string text)
+        public static void PutSquareOnBoard(Mat image, SquareBoundsCurve boundary, bool thick = false,
+            double resize = 1)
         {
-            PutTextOnImage(image, GeometryUtilis.MassCenter(approxCurve), text);
-        }
-
-        public static void PutSquareOnBoard(Mat image, Point center, int radius, bool thick = false)
-        {
+            int radius = (int) (boundary.Radius * resize);
             int thickness = thick ? 2 : 1;
             CvInvoke.Rectangle(
                 image,
-                new Rectangle(center.X - radius, center.Y - radius, 2 * radius + 1, 2 * radius + 1),
+                new Rectangle(boundary.MassCenter.X - radius, boundary.MassCenter.Y - radius,
+                    2 * radius + 1, 2 * radius + 1),
                 new Bgr(0, 255, 0).MCvScalar,
                 thickness,
                 LineType.EightConnected,

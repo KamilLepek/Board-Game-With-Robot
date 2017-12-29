@@ -76,6 +76,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="Map\Field.cs" />
     <Compile Include="Map\GamePawn.cs" />
+    <Compile Include="Map\SquareBoundsCurve.cs" />
     <Compile Include="Utilities\DrawingService.cs" />
     <Compile Include="ImageProcessing\StaticServices\SimpleImageProcessingServices.cs" />
     <Compile Include="Map\Board.cs" />

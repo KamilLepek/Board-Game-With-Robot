@@ -1,10 +1,24 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace BoardGameWithRobot.Utilities
 {
     internal class Constants
     {
+        public const int DistanceFromLastPositionIgnoringMargin = 5;
+
+        public const int MessageFramesDuration = int.MaxValue;
+        public const int BlueHueBottomConstraint = 199;
+        public const int BlueHueTopConstraint = 240;
+        public const double ColorRadiusDetectingFactor = 0.8;
+        public const int DefaultCurveSizeIgnoringMargin = 2000;
+        public const double CurveDetectingFactor = 0.02;
+        public const string WindowName = "Board Game";
+
+        /// <summary>
+        ///     We ignore squares with bigger radius than this
+        /// </summary>
+        public const int SquareRadiusMargin = 100;
+
         #region Gaussian blur
 
         public static Size KSize = new Size(5, 5);
@@ -24,29 +38,13 @@ namespace BoardGameWithRobot.Utilities
 
         public const int NumberOfTrackers = 4;
         public const int MinimumNumberOfActiveTrackers = 3;
-
-        /// <summary>
-        /// We ignore trackers with bigger radius than this
-        /// </summary>
-        public const int BlueTrackerRadiusMargin = 100;
-
         public const int AmountOfInitFramesToSearchForTrackers = 10;
         public const int MaxFrameAmountTrackerNotDetectedToDelete = 50;
+        public const int TrackerCurveSizeIgnoringMargin = 5000;
 
         #endregion
 
-        public const int DistanceFromLastPositionIgnoringMargin = 5;
-
-        public const int MessageFramesDuration = Int32.MaxValue;
-        public const int BlueHueBottomConstraint = 199;
-        public const int BlueHueTopConstraint = 240;
-        public const double ColorRadiusDetectingFactor = 0.8;
-        public const int DefaultCurveSizeIgnoringMargin = 2000;
-        public const int BlueTrackerCurveSizeIgnoringMargin = 5000;
-        public const double CurveDetectingFactor = 0.02;
-        public const int CameraId = 1;
-        public const string WindowName = "Board Game";
-        public const int MinimumDelayBetweenFrames = 1; //ms
+        #region Dice constants
 
         public const int DiceContourSizeTopConstraint = 1200;
         public const int DiceContourSizeBottomConstraint = 700;
@@ -59,20 +57,32 @@ namespace BoardGameWithRobot.Utilities
         public const int DiceRollingPipsMargin = 5;
         public const int IgnoredDistanceBetweenPips = 5;
 
+        #endregion
+
+        #region Field constants
 
         public const int AmountOfInitFramesToSearchForFields = 20;
         public const int NumberOfFields = 20;
         public const int FieldSizeIgnoringMargin = 10000;
 
+        #endregion
+
+        #region Pawn constants
 
         public const int NumberOfPawns = 2;
-
         public const int AmountOfInitFramesToSearchForPawns = 20;
         public const int PawnContourSizeBottomConstraint = 2000;
         public const int PawnContourSizeTopConstraint = 5000;
         public const int PawnDistanceFromFieldMargin = 50;
 
+        #endregion
+
+        #region Camera related constants
 
         public const string Quality = "FHD"; //FHD, HD, 480
+        public const int CameraId = 1;
+        public const int MinimumDelayBetweenFrames = 1; //ms
+
+        #endregion
     }
 }
