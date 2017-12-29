@@ -30,7 +30,7 @@ namespace BoardGameWithRobot.Utilities
         /// </summary>
         public const int BlueTrackerRadiusMargin = 100;
 
-        public const int AmountOfInitFramesToSearchForTrackers = 20;
+        public const int AmountOfInitFramesToSearchForTrackers = 10;
         public const int MaxFrameAmountTrackerNotDetectedToDelete = 50;
 
         #endregion
@@ -60,9 +60,18 @@ namespace BoardGameWithRobot.Utilities
         public const int IgnoredDistanceBetweenPips = 5;
 
 
-        public const int AmountOfInitFramesToSearchForFields = 10;
+        public const int AmountOfInitFramesToSearchForFields = 20;
         public const int NumberOfFields = 20;
         public const int FieldSizeIgnoringMargin = 10000;
+
+
+        public const int NumberOfPawns = 2;
+
+        public const int AmountOfInitFramesToSearchForPawns = 20;
+        public const int PawnContourSizeBottomConstraint = 2000;
+        public const int PawnContourSizeTopConstraint = 5000;
+        public const int PawnDistanceFromFieldMargin = 50;
+
 
         public const string Quality = "FHD"; //FHD, HD, 480
     }

@@ -24,6 +24,8 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly FieldsDetectingService fieldsDetectingService;
 
+        private readonly GamePawnsDetectingService gamePawnsDetectingService;
+
         private Enums.Situation situation;
 
         private Enums.Player player;
@@ -40,7 +42,8 @@ namespace BoardGameWithRobot.Controllers
             this.cameraService = new CameraService();
             this.blueSquareTrackingService = new BlueSquareTrackingService(this.cameraService, this.board);
             this.fieldsDetectingService = new FieldsDetectingService(this.cameraService, this.board);
-            this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService, this.fieldsDetectingService, this.board);
+            this.gamePawnsDetectingService = new GamePawnsDetectingService(this.cameraService, this.board);
+            this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService, this.fieldsDetectingService, this.gamePawnsDetectingService, this.board);
             this.diceDetectingService = new DiceDetectingService(this.cameraService);
         }
 
@@ -58,6 +61,7 @@ namespace BoardGameWithRobot.Controllers
                 return false;
             this.situation = Enums.Situation.AwaitToRollTheDice;
             this.player = Enums.Player.Human;
+            MessageBox.Show("Initialization Completed! Press ok to start.");
             return true;
         }
 

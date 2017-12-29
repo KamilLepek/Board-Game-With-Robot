@@ -13,10 +13,26 @@ namespace BoardGameWithRobot.Map
 
         public List<Field> FieldsList { get; }
 
+        public List<GamePawn> PawnsList { get; }
+
         public Board()
         {
             this.TrackersList = new List<BlueSquareTracker>();
             this.FieldsList = new List<Field>();
+            this.PawnsList = new List<GamePawn>();
+        }
+
+        public bool LookForPawnOnInit(Point position)
+        {
+            if (!this.PawnsList.Any())
+                return false;
+            foreach (var pawn in this.PawnsList)
+            {
+                if (GeometryUtilis.DistanceBetweenPoints(pawn.Center, position) <
+                    Constants.DistanceFromLastPositionIgnoringMargin)
+                    return true;
+            }
+            return false;
         }
 
         public bool LookForField(Point position)
@@ -48,7 +64,7 @@ namespace BoardGameWithRobot.Map
                     .ToList();
                 result = "R";
             }
-            int i = sortedFieldList.IndexOf(field);
+            int i = Constants.NumberOfFields / 2 - sortedFieldList.IndexOf(field);
             result += i;
             field.Label = result;
         }

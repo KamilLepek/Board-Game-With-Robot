@@ -15,38 +15,72 @@ namespace BoardGameWithRobot.ImageProcessing
 
         private readonly FieldsDetectingService fieldsDetectingService;
 
+        private readonly GamePawnsDetectingService gamePawnsDetectingService;
+
         private readonly Board board;
 
-        public Initializator(CameraService camera, BlueSquareTrackingService blueSquareTracking, FieldsDetectingService fieldService, Board b)
+        public Initializator(CameraService camera, BlueSquareTrackingService blueSquareTracking,
+            FieldsDetectingService fieldService, GamePawnsDetectingService gamePawnsService, Board b)
         {
             this.board = b;
             this.cameraService = camera;
             this.blueSquareTrackingService = blueSquareTracking;
             this.fieldsDetectingService = fieldService;
+            this.gamePawnsDetectingService = gamePawnsService;
         }
 
         /// <summary>
-        /// Initializes board related elements
+        /// Initializes board related(visual) elements
         /// </summary>
         /// <returns>returns true if starting the game is not forbidden</returns>
         public bool InitializeBoard()
         {
             if (!this.DetectTrackersOnInit()) 
             {
-                Console.WriteLine("Trackers initialization failed.");
-                return false;
+                Console.WriteLine("Trackers initialization failed. Trying again...");
+                if (!this.DetectTrackersOnInit())
+                {
+                    Console.WriteLine("Trackers initialization failed.");
+                    return false;
+                }
             }
             if (!this.DetectFieldsOnInit())
             {
-                Console.WriteLine("Fields initialization failed.");
+                Console.WriteLine("Fields initialization failed. Trying again...");
+                if (!this.DetectFieldsOnInit())
+                {
+                    Console.WriteLine("Fields initialization failed.");
+                    return false;
+                }
+            }
+            if (!this.DetectGamePawnsOnInit())
+            {
+                Console.WriteLine("Game pawns initialization failed.");
                 return false;
-            }  
+            }
             return true;
         }
 
+        
         public bool InitializeRobot()
         {
             return true;
+        }
+
+        public bool DetectGamePawnsOnInit()
+        {
+            for (int i = 0; i < Constants.AmountOfInitFramesToSearchForPawns; i++)
+            {
+                this.cameraService.GetCameraFrame();
+                this.gamePawnsDetectingService.DetectPawnsOnInit();
+                this.cameraService.ShowFrame();
+            }
+            if (this.board.PawnsList.Count == Constants.NumberOfPawns)
+            {
+                return true;
+            }
+            Console.WriteLine("{0} pawns detected instead of {1}", this.board.PawnsList.Count, Constants.NumberOfPawns);
+            return false;
         }
 
         public bool DetectFieldsOnInit()
