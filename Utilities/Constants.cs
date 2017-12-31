@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace BoardGameWithRobot.Utilities
 {
@@ -37,24 +38,24 @@ namespace BoardGameWithRobot.Utilities
         #region Tracker constants
 
         public const int NumberOfTrackers = 4;
-        public const int MinimumNumberOfActiveTrackers = 3;
+        public const int MinimumNumberOfActiveTrackers = 2;
         public const int AmountOfInitFramesToSearchForTrackers = 10;
-        public const int MaxFrameAmountTrackerNotDetectedToDelete = 50;
+        public const int MaxFrameAmountTrackerNotDetectedToBecomeInactive = 150;
         public const int TrackerCurveSizeIgnoringMargin = 5000;
 
         #endregion
 
         #region Dice constants
 
-        public const int DiceContourSizeTopConstraint = 1200;
-        public const int DiceContourSizeBottomConstraint = 700;
+        public const int DiceContourSizeTopConstraint = 900;
+        public const int DiceContourSizeBottomConstraint = 600;
         public const int DiceSquareRadiusConstraint = 25;
-        public const int DiceFramesDetectedAcceptanceMargin = 20; //20
-        public const int DicePipBottomSizeConstraint = 1000;
+        public const int DiceFramesDetectedAcceptanceMargin = 40;
+        public const int DicePipBottomSizeConstraint = 750;
         public const int DicePipTopSizeConstraint = 2000;
         public const int DiceBinaryPoint = 125;
         public const int DiceResizingFactor = 10;
-        public const int DiceRollingPipsMargin = 5;
+        public const int DiceFramesIgnoredInPipsDetection = 15;
         public const int IgnoredDistanceBetweenPips = 5;
 
         #endregion
@@ -71,16 +72,17 @@ namespace BoardGameWithRobot.Utilities
 
         public const int NumberOfPawns = 2;
         public const int AmountOfInitFramesToSearchForPawns = 20;
-        public const int PawnContourSizeBottomConstraint = 2000;
-        public const int PawnContourSizeTopConstraint = 5000;
+        public const int PawnContourSizeBottomConstraint = 1000;
+        public const int PawnContourSizeTopConstraint = 3000;
         public const int PawnDistanceFromFieldMargin = 50;
+        public const int AmountOfFramesToDeterminePawn = 10;
 
         #endregion
 
         #region Camera related constants
 
         public const string Quality = "FHD"; //FHD, HD, 480
-        public const int CameraId = 1;
+        public const int CameraId = 0;
         public const int MinimumDelayBetweenFrames = 1; //ms
 
         #endregion

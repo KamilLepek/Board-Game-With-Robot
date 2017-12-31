@@ -119,5 +119,15 @@ namespace BoardGameWithRobot.Map
             foreach (var field in this.FieldsList)
                 field.Print(image);
         }
+
+        public void PrintPawnsSquarePlaceOnBoard(Mat image)
+        {
+            if(this.PawnsList.Count != Constants.NumberOfPawns)
+                throw new ArgumentOutOfRangeException();
+            foreach (var gamePawn in this.PawnsList)
+            {
+                gamePawn.PrintPawnPlace(image);
+            }
+        }
     }
 }

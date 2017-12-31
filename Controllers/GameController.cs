@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
 using BoardGameWithRobot.ImageProcessing;
 using BoardGameWithRobot.Map;
@@ -71,7 +72,8 @@ namespace BoardGameWithRobot.Controllers
         /// </summary>
         public void PlayGame()
         {
-            while (true)
+            bool finishFlag = false;
+            while (!finishFlag)
             {
                 this.timer.Restart();
                 this.cameraService.GetCameraFrame();
@@ -84,7 +86,7 @@ namespace BoardGameWithRobot.Controllers
                     return;
                 }
 
-                this.AnalyzeAndChangeStateOfGame();
+                this.AnalyzeAndChangeStateOfGame(ref finishFlag);
                 this.DisplayElementsOnBoard();
                 this.cameraService.ShowFrame();
                 Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " +
@@ -101,7 +103,7 @@ namespace BoardGameWithRobot.Controllers
         private void IncrementFramesAndCheckTrackersState()
         {
             foreach (var blueSquareTracker in this.board.TrackersList)
-                if (blueSquareTracker.FramesSinceDetected++ > Constants.MaxFrameAmountTrackerNotDetectedToDelete)
+                if (blueSquareTracker.FramesSinceDetected++ > Constants.MaxFrameAmountTrackerNotDetectedToBecomeInactive)
                     blueSquareTracker.State = Enums.TrackerDetectionState.Inactive;
         }
 
@@ -109,12 +111,13 @@ namespace BoardGameWithRobot.Controllers
         {
             this.board.PrintTrackersOnImage(this.cameraService.ActualFrame);
             this.board.PrintFieldsOnBoard(this.cameraService.ActualFrame);
+            this.board.PrintPawnsSquarePlaceOnBoard(this.cameraService.ActualFrame);
         }
 
         /// <summary>
         ///     Analyzes and changes actual state of the game
         /// </summary>
-        private void AnalyzeAndChangeStateOfGame()
+        private void AnalyzeAndChangeStateOfGame(ref bool finishFlag)
         {
             this.IncrementFramesAndCheckTrackersState();
             switch (this.situation)
@@ -126,14 +129,27 @@ namespace BoardGameWithRobot.Controllers
                 case Enums.Situation.AwaitForReaction:
                     MessageLogger.LogMessage(string.Format("{0} turn. Move {1} squares!", this.player.ToString(),
                         this.dicePipsNumber));
-                    if (false) //validate that player has finished his movement!
-                    {
-                        this.situation = Enums.Situation.AwaitToRollTheDice;
-                        this.ChangeTurn();
-                    }
+                    this.ChangeStateUponMovementFinishDetection(ref finishFlag);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        
+
+        private void ChangeStateUponMovementFinishDetection(ref bool finishFlag)
+        {
+            if (this.gamePawnsDetectingService.DetectPawnOnExpectedField(ref this.dicePipsNumber, this.player)) //validate that player has finished his movement!
+            {
+                if (this.board.PawnsList.FindIndex(v => v.SquareNumber == Constants.NumberOfFields / 2) >= 0)
+                {
+                    finishFlag = true;
+                    MessageLogger.LogMessage(string.Format("{0} won!", this.player.ToString()));
+                }
+                this.gamePawnsDetectingService.PawnDetectionAfterMovementFramesAmount = 0;
+                this.situation = Enums.Situation.AwaitToRollTheDice;
+                this.ChangeTurn();
             }
         }
 

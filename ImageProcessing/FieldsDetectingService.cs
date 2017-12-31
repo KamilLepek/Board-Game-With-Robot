@@ -1,4 +1,5 @@
-﻿using BoardGameWithRobot.Map;
+﻿using System;
+using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
 using Emgu.CV;
 
@@ -33,7 +34,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     !this.board.LookForTracker(boundary.MassCenter))
                 {
 #if DEBUG
-                    DrawingService.PutTextOnImage(this.cameraService.ActualFrame, boundary.MassCenter, "field");
+                    DrawingService.PutTextOnImage(this.cameraService.ActualFrame, boundary.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
 #endif
                     this.AddFieldIfNecessary(boundary);
                 }

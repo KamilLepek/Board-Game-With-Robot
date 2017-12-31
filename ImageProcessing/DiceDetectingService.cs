@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
@@ -47,6 +48,9 @@ namespace BoardGameWithRobot.ImageProcessing
                     continue;
                 this.DefineDiceRegion(boundary);
                 DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, this.squareBounds, true);
+#if DEBUG
+                DrawingService.PutTextOnImage(this.cameraService.ActualFrame, boundary.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
+#endif
                 this.DetectRolledNumber();
                 return true;
             }
@@ -97,6 +101,7 @@ namespace BoardGameWithRobot.ImageProcessing
                 this.AddToPipListIfNecessary(boundary.MassCenter);
 #if DEBUG
                 DrawingService.PutSquareOnBoard(resized, boundary);
+                DrawingService.PutTextOnImage(resized, boundary.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
 #endif
             }
 
@@ -109,7 +114,7 @@ namespace BoardGameWithRobot.ImageProcessing
 
         private void AddToPipListIfNecessary(Point center)
         {
-            if (this.rollingFramesCounter > Constants.DiceRollingPipsMargin)
+            if (this.rollingFramesCounter > Constants.DiceFramesIgnoredInPipsDetection)
             {
                 foreach (var pip in this.pips)
                     if (GeometryUtilis.DistanceBetweenPoints(center, pip) < Constants.IgnoredDistanceBetweenPips)
