@@ -47,16 +47,16 @@ namespace BoardGameWithRobot.Utilities
 
         #region Dice constants
 
-        public const int DiceContourSizeTopConstraint = 900;
-        public const int DiceContourSizeBottomConstraint = 600;
+        public const int DiceContourSizeTopConstraint = 1300;
+        public const int DiceContourSizeBottomConstraint = 900;
         public const int DiceSquareRadiusConstraint = 25;
-        public const int DiceFramesDetectedAcceptanceMargin = 40;
-        public const int DicePipBottomSizeConstraint = 750;
-        public const int DicePipTopSizeConstraint = 2000;
-        public const int DiceBinaryPoint = 125;
+        public const int DiceFramesDetectedAcceptanceMargin = 15;
+        public const int DicePipBottomSizeConstraint = 550;
+        public const int DicePipTopSizeConstraint = 1800;
+        public const int DiceBinaryPoint = 95;
         public const int DiceResizingFactor = 10;
-        public const int DiceFramesIgnoredInPipsDetection = 15;
-        public const int IgnoredDistanceBetweenPips = 5;
+        public const int DiceFramesIgnoredInPipsDetection = 10;
+        public const int IgnoredDistanceBetweenPips = 15;
 
         #endregion
 
@@ -75,7 +75,7 @@ namespace BoardGameWithRobot.Utilities
         public const int PawnContourSizeBottomConstraint = 1000;
         public const int PawnContourSizeTopConstraint = 3000;
         public const int PawnDistanceFromFieldMargin = 50;
-        public const int AmountOfFramesToDeterminePawn = 10;
+        public const int AmountOfFramesToDeterminePawn = 5;
 
         #endregion
 
