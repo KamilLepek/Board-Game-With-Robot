@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Net.Sockets;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
+using Renci.SshNet;
 
 namespace BoardGameWithRobot.ImageProcessing
 {
@@ -63,6 +65,16 @@ namespace BoardGameWithRobot.ImageProcessing
 
         public bool InitializeRobot()
         {
+            RobotControllingService.InitializeSshConnectionParams();
+            try
+            {
+                RobotControllingService.Ssh.Connect();
+            }
+            catch (SocketException)
+            {
+                Console.WriteLine("Couldn't connect to Robot");
+                return false;
+            }
             return true;
         }
 

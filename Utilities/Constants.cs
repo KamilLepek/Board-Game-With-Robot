@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace BoardGameWithRobot.Utilities
 {
@@ -19,6 +18,12 @@ namespace BoardGameWithRobot.Utilities
         ///     We ignore squares with bigger radius than this
         /// </summary>
         public const int SquareRadiusMargin = 100;
+
+        public const string RemoteControlScript = "REMOTE_CONTROL/Remote.py";
+        public const string RobotAdress = "192.168.0.54";
+        public const int RobotPort = 22;
+        public const string RobotLogin = "pi";
+        public const string Password = "BezSensu";
 
         #region Gaussian blur
 
@@ -63,7 +68,7 @@ namespace BoardGameWithRobot.Utilities
         #region Field constants
 
         public const int AmountOfInitFramesToSearchForFields = 20;
-        public const int NumberOfFields = 20;
+        public const int NumberOfFields = 18;
         public const int FieldSizeIgnoringMargin = 10000;
 
         #endregion

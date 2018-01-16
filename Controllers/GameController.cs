@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows.Forms;
 using BoardGameWithRobot.ImageProcessing;
 using BoardGameWithRobot.Map;

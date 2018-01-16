@@ -1,5 +1,7 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using BoardGameWithRobot.Controllers;
+using BoardGameWithRobot.Utilities;
 using Emgu.CV;
 
 namespace BoardGameWithRobot
@@ -8,6 +10,7 @@ namespace BoardGameWithRobot
     {
         private static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
             var controller = new GameController();
 
             if (controller.InitializeGame())
@@ -18,6 +21,13 @@ namespace BoardGameWithRobot
             }
             MessageBox.Show("Game initialization failed");
             CvInvoke.WaitKey();
+        }
+
+        static void OnProcessExit(object sender, EventArgs e)
+        {
+            Console.WriteLine("Disconnecting Ssh");
+            RobotControllingService.Ssh.Disconnect();
+            RobotControllingService.Ssh.Dispose();
         }
     }
 }
