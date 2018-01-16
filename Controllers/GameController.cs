@@ -111,6 +111,7 @@ namespace BoardGameWithRobot.Controllers
             this.board.PrintTrackersOnImage(this.cameraService.ActualFrame);
             this.board.PrintFieldsOnBoard(this.cameraService.ActualFrame);
             this.board.PrintPawnsSquarePlaceOnBoard(this.cameraService.ActualFrame);
+            this.board.PrintRobotTrackLineOnBoard(this.cameraService.ActualFrame);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Renci.SshNet;
 
 namespace BoardGameWithRobot.Utilities
@@ -6,6 +7,12 @@ namespace BoardGameWithRobot.Utilities
     internal static class RobotControllingService
     {
         public static SshClient Ssh { get; private set; }
+
+        public static Point TrackStartPoint { get; set; }
+
+        public static Point TrackEndPoint { get; set; }
+
+        public static Point Vector => new Point(TrackEndPoint.X - TrackStartPoint.X, TrackEndPoint.Y - TrackStartPoint.Y);
 
         public static void InitializeSshConnectionParams()
         {

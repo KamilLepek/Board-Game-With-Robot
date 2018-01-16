@@ -22,7 +22,7 @@ namespace BoardGameWithRobot.Utilities
                 new Bgr(0, 255, 0).MCvScalar);
         }
 
-        public static void PutSquareOnBoard(Mat image, SquareBoundsCurve boundary, bool thick = false,
+        public static void PutSquareOnImage(Mat image, SquareBoundsCurve boundary, bool thick = false,
             double resize = 1)
         {
             int radius = (int) (boundary.Radius * resize);
@@ -33,6 +33,19 @@ namespace BoardGameWithRobot.Utilities
                     2 * radius + 1, 2 * radius + 1),
                 new Bgr(0, 255, 0).MCvScalar,
                 thickness,
+                LineType.EightConnected,
+                0);
+        }
+
+        public static void PutLineOnImage(Mat image, Point startPoint, Point endPoint, bool thick = false)
+        {
+            int thickness = thick ? 2 : 1;
+            CvInvoke.Line(
+                image, 
+                startPoint, 
+                endPoint, 
+                new Bgr(0, 255, 0).MCvScalar, 
+                thickness, 
                 LineType.EightConnected,
                 0);
         }

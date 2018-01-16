@@ -42,7 +42,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     Constants.PawnDistanceFromFieldMargin)
                     continue;
 #if DEBUG
-                DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, boundary);
+                DrawingService.PutSquareOnImage(this.cameraService.ActualFrame, boundary);
                 DrawingService.PutTextOnImage(this.cameraService.ActualFrame, boundary.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
 #endif
                 this.AddPawnsIfNecessary(boundary);
@@ -112,7 +112,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     new Point(searchingFiled.Boundary.MassCenter.X + boundary.MassCenter.X - img.Mat.Width / 2,
                         searchingFiled.Boundary.MassCenter.Y + boundary.MassCenter.Y - img.Mat.Height / 2);
                 SquareBoundsCurve detectedFragment = new SquareBoundsCurve(centerPoint, boundary.Radius);
-                DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, detectedFragment);
+                DrawingService.PutSquareOnImage(this.cameraService.ActualFrame, detectedFragment);
 #if DEBUG
                 DrawingService.PutTextOnImage(this.cameraService.ActualFrame, detectedFragment.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
 #endif

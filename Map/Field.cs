@@ -17,7 +17,7 @@ namespace BoardGameWithRobot.Map
 
         public void Print(Mat image)
         {
-            DrawingService.PutSquareOnBoard(image, this.Boundary, true, 1 / Math.Sqrt(2));
+            DrawingService.PutSquareOnImage(image, this.Boundary, true, 1 / Math.Sqrt(2));
             DrawingService.PutTextOnImage(image, this.Boundary.MassCenter, this.Label);
         }
     }

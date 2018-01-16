@@ -120,6 +120,11 @@ namespace BoardGameWithRobot.Map
                 field.Print(image);
         }
 
+        public void PrintRobotTrackLineOnBoard(Mat image)
+        {
+            DrawingService.PutLineOnImage(image, RobotControllingService.TrackStartPoint, RobotControllingService.TrackEndPoint, true);
+        }
+
         public void PrintPawnsSquarePlaceOnBoard(Mat image)
         {
             if(this.PawnsList.Count != Constants.NumberOfPawns)

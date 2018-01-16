@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
@@ -104,6 +105,10 @@ namespace BoardGameWithRobot.ImageProcessing
             {
                 foreach (var field in this.board.FieldsList)
                     this.board.SetFieldLabel(field);
+                RobotControllingService.TrackStartPoint =
+                    this.board.FieldsList.Find(v => v.Label == "R1").Boundary.MassCenter;
+                RobotControllingService.TrackEndPoint =
+                    this.board.FieldsList.Find(v => v.Label == $"R{Constants.NumberOfFields / 2}").Boundary.MassCenter;
                 return true;
             }
             Console.WriteLine("{0} fields detected instead of {1}", this.board.FieldsList.Count,

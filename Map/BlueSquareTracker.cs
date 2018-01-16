@@ -32,7 +32,7 @@ namespace BoardGameWithRobot.Map
         /// </summary>
         public void PrintTracker(Mat img)
         {
-            DrawingService.PutSquareOnBoard(img, this.Boundary, true, 1/Math.Sqrt(2));
+            DrawingService.PutSquareOnImage(img, this.Boundary, true, 1/Math.Sqrt(2));
         }
 
         public void SetImage(Mat img)

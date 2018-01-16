@@ -47,7 +47,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     boundary.Radius > Constants.DiceSquareRadiusConstraint)
                     continue;
                 this.DefineDiceRegion(boundary);
-                DrawingService.PutSquareOnBoard(this.cameraService.ActualFrame, this.squareBounds, true);
+                DrawingService.PutSquareOnImage(this.cameraService.ActualFrame, this.squareBounds, true);
 #if DEBUG
                 DrawingService.PutTextOnImage(this.cameraService.ActualFrame, boundary.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
 #endif
@@ -100,7 +100,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     continue;
                 this.AddToPipListIfNecessary(boundary.MassCenter);
 #if DEBUG
-                DrawingService.PutSquareOnBoard(resized, boundary);
+                DrawingService.PutSquareOnImage(resized, boundary);
                 DrawingService.PutTextOnImage(resized, boundary.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
 #endif
             }
