@@ -5,6 +5,7 @@ namespace BoardGameWithRobot.Utilities
     internal class Constants
     {
         public const int DistanceFromLastPositionIgnoringMargin = 5;
+        public const int DistanceFromCenterThatDiceIsSearched = 350;
 
         public const int MessageFramesDuration = int.MaxValue;
         public const int BlueHueBottomConstraint = 199;
@@ -55,12 +56,12 @@ namespace BoardGameWithRobot.Utilities
         public const int DiceContourSizeTopConstraint = 1300;
         public const int DiceContourSizeBottomConstraint = 900;
         public const int DiceSquareRadiusConstraint = 25;
-        public const int DiceFramesDetectedAcceptanceMargin = 15;
+        public const int DiceFramesDetectedAcceptanceMargin = 25;
         public const int DicePipBottomSizeConstraint = 550;
         public const int DicePipTopSizeConstraint = 1800;
         public const int DiceBinaryPoint = 95;
         public const int DiceResizingFactor = 10;
-        public const int DiceFramesIgnoredInPipsDetection = 10;
+        public const int DiceFramesIgnoredInPipsDetection = 5;
         public const int IgnoredDistanceBetweenPips = 15;
 
         #endregion

@@ -19,6 +19,7 @@ namespace BoardGameWithRobot.Utilities
         {
             try
             {
+                MessageLogger.LogMessage("Initializing Camera...");
                 this.cameraDevice = new Capture(Constants.CameraId);
                 this.SetCameraProperties();
                 this.cameraDevice.Start();

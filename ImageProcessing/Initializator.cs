@@ -38,6 +38,7 @@ namespace BoardGameWithRobot.ImageProcessing
         /// <returns>returns true if starting the game is not forbidden</returns>
         public bool InitializeBoard()
         {
+            MessageLogger.LogMessage("Initializing Board: Trackers detection..");
             if (!this.DetectTrackersOnInit())
             {
                 Console.WriteLine("Trackers initialization failed. Trying again...");
@@ -47,6 +48,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     return false;
                 }
             }
+            MessageLogger.LogMessage("Initializing Board: Fields detection..");
             if (!this.DetectFieldsOnInit())
             {
                 Console.WriteLine("Fields initialization failed. Trying again...");
@@ -56,6 +58,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     return false;
                 }
             }
+            MessageLogger.LogMessage("Initializing Board: Pawns detection..");
             if (!this.DetectGamePawnsOnInit())
             {
                 Console.WriteLine("Game pawns initialization failed.");
@@ -66,6 +69,7 @@ namespace BoardGameWithRobot.ImageProcessing
 
         public bool InitializeRobot()
         {
+            MessageLogger.LogMessage("Initializing SSH connection with robot..");
             RobotControllingService.InitializeSshConnectionParams();
             try
             {

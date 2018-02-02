@@ -28,13 +28,17 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly Stopwatch timer = new Stopwatch();
 
-        private int diceDetectionFrames;
-
         private int dicePipsNumber;
 
         private Enums.Player player;
 
         private Enums.Situation situation;
+
+        private bool diceHasBeenSpotted = false;
+
+        private bool diceHasBeenSpottedAndFinishedMovement = false;
+
+        private int diceDetectionFrames = 0;
 
         public GameController()
         {
@@ -123,20 +127,17 @@ namespace BoardGameWithRobot.Controllers
             switch (this.situation)
             {
                 case Enums.Situation.AwaitToRollTheDice:
-                    MessageLogger.LogMessage(string.Format("{0} turn. Roll the dice!", this.player.ToString()));
+                    MessageLogger.LogMessage($"{this.player.ToString()} turn. Roll the dice!");
                     this.ChangeStateUponDiceDetection();
                     break;
                 case Enums.Situation.AwaitForReaction:
-                    MessageLogger.LogMessage(string.Format("{0} turn. Move {1} squares!", this.player.ToString(),
-                        this.dicePipsNumber));
+                    MessageLogger.LogMessage($"{this.player.ToString()} turn. Move {this.dicePipsNumber} squares!");
                     this.ChangeStateUponMovementFinishDetection(ref finishFlag);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        
 
         private void ChangeStateUponMovementFinishDetection(ref bool finishFlag)
         {
@@ -145,7 +146,7 @@ namespace BoardGameWithRobot.Controllers
                 if (this.board.PawnsList.FindIndex(v => v.SquareNumber == Constants.NumberOfFields / 2) >= 0)
                 {
                     finishFlag = true;
-                    MessageLogger.LogMessage(string.Format("{0} won!", this.player.ToString()));
+                    MessageLogger.LogMessage($"{this.player.ToString()} won!");
                 }
                 this.gamePawnsDetectingService.PawnDetectionAfterMovementFramesAmount = 0;
                 this.situation = Enums.Situation.AwaitToRollTheDice;
@@ -158,23 +159,33 @@ namespace BoardGameWithRobot.Controllers
         /// </summary>
         private void ChangeStateUponDiceDetection()
         {
-            if (this.diceDetectingService.DetectDice())
+            if (this.diceHasBeenSpotted)
+            {
                 this.diceDetectionFrames++;
-            else
-                this.diceDetectionFrames--;
-            if (this.diceDetectionFrames < 0)
-            {
-                // Reset region in order to search again
-                this.diceDetectionFrames = 0;
-                this.diceDetectingService.IsDiceRegionDefined = false;
+                if (this.diceHasBeenSpottedAndFinishedMovement)
+                {
+                    this.diceDetectingService.DetectRolledNumber();
+                    if (this.diceDetectionFrames == Constants.DiceFramesDetectedAcceptanceMargin)
+                    {
+                        this.dicePipsNumber = this.diceDetectingService.DetermineNumberAndResetPipList();
+                        this.diceDetectionFrames = 0;
+                        this.diceDetectingService.IsDiceRegionDefined = false;
+                        this.diceHasBeenSpotted = false;
+                        this.diceHasBeenSpottedAndFinishedMovement = false;
+                        this.situation = Enums.Situation.AwaitForReaction;
+                    }
+                }
+                else
+                {
+                    if (this.diceDetectionFrames <= 5)
+                        return;
+                    this.diceDetectionFrames--;
+                    this.diceHasBeenSpottedAndFinishedMovement = this.diceDetectingService.DetectDice();
+                }
             }
-
-            if (this.diceDetectionFrames == Constants.DiceFramesDetectedAcceptanceMargin)
+            else
             {
-                this.dicePipsNumber = this.diceDetectingService.DetermineNumberAndResetPipList();
-                this.diceDetectionFrames = 0;
-                this.diceDetectingService.IsDiceRegionDefined = false;
-                this.situation = Enums.Situation.AwaitForReaction;
+                this.diceHasBeenSpotted = this.diceDetectingService.DetectDice();                    
             }
         }
 

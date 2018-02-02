@@ -16,8 +16,6 @@ namespace BoardGameWithRobot.ImageProcessing
 
         private List<Point> pips;
 
-        private int rollingFramesCounter;
-
         private SquareBoundsCurve squareBounds;
 
         public DiceDetectingService(CameraService camera)
@@ -31,6 +29,10 @@ namespace BoardGameWithRobot.ImageProcessing
 
         public Image<Rgb, byte> Image { get; set; }
 
+        /// <summary>
+        ///     Detects dice
+        /// </summary>
+        /// <returns> Returns true if dice have been detected on actual frame </returns>
         public bool DetectDice()
         {
             var curves =
@@ -44,19 +46,24 @@ namespace BoardGameWithRobot.ImageProcessing
                         boundary.Curve, Constants.DiceContourSizeTopConstraint,
                         Constants.DiceContourSizeBottomConstraint) ||
                     !CvInvoke.IsContourConvex(boundary.Curve) ||
-                    boundary.Radius > Constants.DiceSquareRadiusConstraint)
+                    boundary.Radius > Constants.DiceSquareRadiusConstraint ||
+                    GeometryUtilis.DistanceBetweenPoints(boundary.MassCenter,
+                        new Point(this.cameraService.ActualFrame.Width / 2, this.cameraService.ActualFrame.Height / 2)) > Constants.DistanceFromCenterThatDiceIsSearched) 
                     continue;
                 this.DefineDiceRegion(boundary);
                 DrawingService.PutSquareOnImage(this.cameraService.ActualFrame, this.squareBounds, true);
 #if DEBUG
                 DrawingService.PutTextOnImage(this.cameraService.ActualFrame, boundary.MassCenter, Math.Abs(CvInvoke.ContourArea(boundary.Curve)).ToString());
 #endif
-                this.DetectRolledNumber();
                 return true;
             }
             return false;
         }
 
+        /// <summary>
+        ///     Updates image on which we will search for pips
+        /// </summary>
+        /// <param name="boundary"> Curve that has been detected as dice </param>
         private void DefineDiceRegion(SquareBoundsCurve boundary)
         {
             if (!this.IsDiceRegionDefined ||
@@ -73,8 +80,12 @@ namespace BoardGameWithRobot.ImageProcessing
                     this.squareBounds);
         }
 
-        private void DetectRolledNumber()
+        /// <summary>
+        ///     Detects pips on defined image. Adds them to pips list if necessary (if they aren't already on the list)
+        /// </summary>
+        public void DetectRolledNumber()
         {
+            this.DefineDiceRegion(this.squareBounds);
             var resized = this.Image.Mat.Clone();
             CvInvoke.Resize(this.Image.Mat, resized, Size.Empty, Constants.DiceResizingFactor,
                 Constants.DiceResizingFactor);
@@ -85,8 +96,6 @@ namespace BoardGameWithRobot.ImageProcessing
 
             var curves = new VectorOfVectorOfPoint();
             CvInvoke.FindContours(canniedBinary, curves, new Mat(), RetrType.Tree, ChainApproxMethod.ChainApproxSimple);
-
-            this.rollingFramesCounter++;
 
             for (int i = 0; i < curves.Size; i++)
             {
@@ -114,18 +123,14 @@ namespace BoardGameWithRobot.ImageProcessing
 
         private void AddToPipListIfNecessary(Point center)
         {
-            if (this.rollingFramesCounter > Constants.DiceFramesIgnoredInPipsDetection)
-            {
-                foreach (var pip in this.pips)
-                    if (GeometryUtilis.DistanceBetweenPoints(center, pip) < Constants.IgnoredDistanceBetweenPips)
-                        return;
-                this.pips.Add(center);
-            }
+            foreach (var pip in this.pips)
+                if (GeometryUtilis.DistanceBetweenPoints(center, pip) < Constants.IgnoredDistanceBetweenPips)
+                    return;
+            this.pips.Add(center);
         }
 
         public int DetermineNumberAndResetPipList()
         {
-            this.rollingFramesCounter = 0;
             int number = this.pips.Count;
             this.pips = new List<Point>();
             return number;

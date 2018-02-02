@@ -20,10 +20,10 @@ namespace BoardGameWithRobot.Map
         {
             if (this.Player == Enums.Player.Human)
                 DrawingService.PutTextOnImage(image, new Point(0, 500),
-                    string.Format("Human: H{0}", this.SquareNumber));
+                    $"Human: H{this.SquareNumber}");
             else
                 DrawingService.PutTextOnImage(image, new Point(0, 550),
-                    string.Format("Robot: R{0}", this.SquareNumber));
+                    $"Robot: R{this.SquareNumber}");
         }
     }
 }

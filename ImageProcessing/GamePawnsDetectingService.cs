@@ -77,7 +77,8 @@ namespace BoardGameWithRobot.ImageProcessing
                 this.PawnDetectionAfterMovementFramesAmount++;
             else
             {
-                this.PawnDetectionAfterMovementFramesAmount--;
+                // workaround for situations where pawn is detected seldom
+                this.PawnDetectionAfterMovementFramesAmount -= this.PawnDetectionAfterMovementFramesAmount % 2 == 0 ? 1 : 0;
                 if (this.PawnDetectionAfterMovementFramesAmount < 0)
                     this.PawnDetectionAfterMovementFramesAmount = 0;
             }
