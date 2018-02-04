@@ -145,8 +145,7 @@ namespace BoardGameWithRobot.Controllers
 
         private void ChangeStateUponMovementFinishDetection(ref bool finishFlag)
         {
-            //TODO: change to false below when implemented to cut image properly
-            this.robotDetectingService.DetectRobot(true);
+            this.robotDetectingService.DetectRobotDuringGame();
             if (this.gamePawnsDetectingService.DetectPawnOnExpectedField(ref this.dicePipsNumber, this.player)) //validate that player has finished his movement!
             {
                 if (this.board.PawnsList.FindIndex(v => v.SquareNumber == Constants.NumberOfFields / 2) >= 0)

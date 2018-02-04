@@ -13,6 +13,9 @@ namespace BoardGameWithRobot.Utilities
             return new Point((int) (moment.M10 / moment.M00), (int) (moment.M01 / moment.M00));
         }
 
+        /// <summary>
+        /// Diffrence of 2 vectors (a-b)
+        /// </summary>
         public static Point DiffrenceVector(Point a, Point b)
         {
             return new Point(a.X - b.X, a.Y - b.Y);

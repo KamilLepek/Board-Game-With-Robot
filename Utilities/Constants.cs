@@ -31,6 +31,7 @@ namespace BoardGameWithRobot.Utilities
         public const int RobotTrackerContourSizeTopConstraint = 5000;
         public const int RobotTrackerContourSizeBottomConstraint = 3000;
         public const int RobotTrackersMinimumDistanceForRecognition = 100;
+        public const int RobotCurveSizeIgnoringMargin = 40;
 
         #region Gaussian blur
 
@@ -94,7 +95,7 @@ namespace BoardGameWithRobot.Utilities
         #region Camera related constants
 
         public const string Quality = "FHD"; //FHD, HD, 480
-        public const int CameraId = 0;
+        public const int CameraId = 1;
         public const int MinimumDelayBetweenFrames = 1; //ms
 
         #endregion

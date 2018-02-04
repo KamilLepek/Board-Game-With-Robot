@@ -97,7 +97,7 @@ namespace BoardGameWithRobot.ImageProcessing
             for (int i = 0; i < Constants.AmountOfInitFramesToSearchForRobot; i++)
             {
                 this.cameraService.GetCameraFrame();
-                bool result = this.robotDetectingService.DetectRobot(true);
+                bool result = this.robotDetectingService.DetectRobotOnInit();
                 this.cameraService.ShowFrame();
                 if (result)
                     return true;
