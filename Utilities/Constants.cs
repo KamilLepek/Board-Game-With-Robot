@@ -10,6 +10,8 @@ namespace BoardGameWithRobot.Utilities
         public const int MessageFramesDuration = int.MaxValue;
         public const int BlueHueBottomConstraint = 199;
         public const int BlueHueTopConstraint = 240;
+        public const int YellowHueBottomConstraint = 30;
+        public const int YellowHueTopConstraint = 80;
         public const double ColorRadiusDetectingFactor = 0.8;
         public const int DefaultCurveSizeIgnoringMargin = 2000;
         public const double CurveDetectingFactor = 0.02;
@@ -25,6 +27,10 @@ namespace BoardGameWithRobot.Utilities
         public const int RobotPort = 22;
         public const string RobotLogin = "pi";
         public const string Password = "BezSensu";
+        public const int AmountOfInitFramesToSearchForRobot = 20;
+        public const int RobotTrackerContourSizeTopConstraint = 5000;
+        public const int RobotTrackerContourSizeBottomConstraint = 3000;
+        public const int RobotTrackersMinimumDistanceForRecognition = 100;
 
         #region Gaussian blur
 

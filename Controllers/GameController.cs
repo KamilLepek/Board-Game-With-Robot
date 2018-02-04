@@ -26,6 +26,8 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly Initializator initializator;
 
+        private readonly RobotDetectingService robotDetectingService;
+
         private readonly Stopwatch timer = new Stopwatch();
 
         private int dicePipsNumber;
@@ -47,8 +49,9 @@ namespace BoardGameWithRobot.Controllers
             this.blueSquareTrackingService = new BlueSquareTrackingService(this.cameraService, this.board);
             this.fieldsDetectingService = new FieldsDetectingService(this.cameraService, this.board);
             this.gamePawnsDetectingService = new GamePawnsDetectingService(this.cameraService, this.board);
+            this.robotDetectingService = new RobotDetectingService(this.board, this.cameraService);
             this.initializator = new Initializator(this.cameraService, this.blueSquareTrackingService,
-                this.fieldsDetectingService, this.gamePawnsDetectingService, this.board);
+                this.fieldsDetectingService, this.gamePawnsDetectingService, this.robotDetectingService, this.board);
             this.diceDetectingService = new DiceDetectingService(this.cameraService);
         }
 
@@ -62,7 +65,7 @@ namespace BoardGameWithRobot.Controllers
                 return false;
             if (!this.initializator.InitializeBoard())
                 return false;
-            if (!this.initializator.InitializeRobot())
+            if (!this.initializator.InitializeRobotConnection())
                 return false;
             this.situation = Enums.Situation.AwaitToRollTheDice;
             this.player = Enums.Player.Human;
@@ -116,6 +119,7 @@ namespace BoardGameWithRobot.Controllers
             this.board.PrintFieldsOnBoard(this.cameraService.ActualFrame);
             this.board.PrintPawnsSquarePlaceOnBoard(this.cameraService.ActualFrame);
             this.board.PrintRobotTrackLineOnBoard(this.cameraService.ActualFrame);
+            this.board.PrintRobotTrackersOnBoard(this.cameraService.ActualFrame);
         }
 
         /// <summary>
@@ -141,6 +145,8 @@ namespace BoardGameWithRobot.Controllers
 
         private void ChangeStateUponMovementFinishDetection(ref bool finishFlag)
         {
+            //TODO: change to false below when implemented to cut image properly
+            this.robotDetectingService.DetectRobot(true);
             if (this.gamePawnsDetectingService.DetectPawnOnExpectedField(ref this.dicePipsNumber, this.player)) //validate that player has finished his movement!
             {
                 if (this.board.PawnsList.FindIndex(v => v.SquareNumber == Constants.NumberOfFields / 2) >= 0)

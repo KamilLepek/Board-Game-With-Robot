@@ -22,6 +22,8 @@ namespace BoardGameWithRobot.Map
 
         public List<GamePawn> PawnsList { get; }
 
+        public Robot Robo { get; set; }
+
         public bool LookForPawnOnInit(Point position)
         {
             if (!this.PawnsList.Any())
@@ -133,6 +135,12 @@ namespace BoardGameWithRobot.Map
             {
                 gamePawn.PrintPawnPlace(image);
             }
+        }
+
+        public void PrintRobotTrackersOnBoard(Mat image)
+        {
+            this.Robo.PrintTrackersOnBoard(image);
+            this.Robo.PrintFrontLineOnBoard(image);
         }
     }
 }

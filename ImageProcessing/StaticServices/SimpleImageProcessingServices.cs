@@ -88,18 +88,21 @@ namespace BoardGameWithRobot.ImageProcessing
         /// <param name="image">Original image</param>
         /// <param name="HSV">HSV image</param>
         /// <param name="boundary">given square</param>
+        /// <param name="printColorOnCurve">Determines whether hue value is printed on the curve</param>
         /// <returns>True if is between, false otherwise</returns>
         public static bool IsHueInSquareBetweenConstraints(
             int bottomConstraint,
             int topConstraint,
             Mat image,
             Mat HSV,
-            SquareBoundsCurve boundary)
+            SquareBoundsCurve boundary,
+            bool printColorOnCurve = true)
         {
             int searchingRadius = (int) (boundary.Radius * Constants.ColorRadiusDetectingFactor);
             int color = ApproximateColorInSquare(HSV, boundary.MassCenter, searchingRadius);
 #if DEBUG
-            DrawingService.PutTextOnImage(image, boundary.MassCenter, color.ToString());
+            if(printColorOnCurve)
+                DrawingService.PutTextOnImage(image, boundary.MassCenter, color.ToString());
 #endif
             if (topConstraint > bottomConstraint)
             {

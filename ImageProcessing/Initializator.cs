@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Sockets;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
-using Renci.SshNet;
 
 namespace BoardGameWithRobot.ImageProcessing
 {
@@ -22,14 +20,17 @@ namespace BoardGameWithRobot.ImageProcessing
 
         private readonly GamePawnsDetectingService gamePawnsDetectingService;
 
+        private readonly RobotDetectingService robotDetectingService;
+
         public Initializator(CameraService camera, BlueSquareTrackingService blueSquareTracking,
-            FieldsDetectingService fieldService, GamePawnsDetectingService gamePawnsService, Board b)
+            FieldsDetectingService fieldService, GamePawnsDetectingService gamePawnsService, RobotDetectingService robotDetecting, Board b)
         {
             this.board = b;
             this.cameraService = camera;
             this.blueSquareTrackingService = blueSquareTracking;
             this.fieldsDetectingService = fieldService;
             this.gamePawnsDetectingService = gamePawnsService;
+            this.robotDetectingService = robotDetecting;
         }
 
         /// <summary>
@@ -64,11 +65,19 @@ namespace BoardGameWithRobot.ImageProcessing
                 Console.WriteLine("Game pawns initialization failed.");
                 return false;
             }
+            MessageLogger.LogMessage("Initializing Board: Robot detection..");
+            if (!this.DetectRobotOnInit())
+            {
+                Console.WriteLine("Robot initialization failed.");
+                return false;
+            }
             return true;
         }
 
-        public bool InitializeRobot()
+        public bool InitializeRobotConnection()
         {
+            //TODO: delete this
+            return true;
             MessageLogger.LogMessage("Initializing SSH connection with robot..");
             RobotControllingService.InitializeSshConnectionParams();
             try
@@ -81,6 +90,19 @@ namespace BoardGameWithRobot.ImageProcessing
                 return false;
             }
             return true;
+        }
+
+        public bool DetectRobotOnInit()
+        {
+            for (int i = 0; i < Constants.AmountOfInitFramesToSearchForRobot; i++)
+            {
+                this.cameraService.GetCameraFrame();
+                bool result = this.robotDetectingService.DetectRobot(true);
+                this.cameraService.ShowFrame();
+                if (result)
+                    return true;
+            }
+            return false;
         }
 
         public bool DetectGamePawnsOnInit()
