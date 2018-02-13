@@ -97,6 +97,7 @@ namespace BoardGameWithRobot.Controllers
                 this.cameraService.ShowFrame();
                 Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " +
                                   (int) (1000 / this.timer.ElapsedMilliseconds) + " fps.");
+                Console.WriteLine($"Angle: {GeometryUtilis.AngleBetweenVectors(RobotControllingService.Vector, this.board.Robo.FrontVector)}");
             }
         }
 

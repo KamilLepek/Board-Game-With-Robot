@@ -32,6 +32,7 @@ namespace BoardGameWithRobot.Utilities
         public const int RobotTrackerContourSizeBottomConstraint = 3000;
         public const int RobotTrackersMinimumDistanceForRecognition = 100;
         public const int RobotCurveSizeIgnoringMargin = 40;
+        public const int RobotImageRadius = 230;
 
         #region Gaussian blur
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq.Expressions;
 using BoardGameWithRobot.Map;
 using BoardGameWithRobot.Utilities;
 using Emgu.CV;
@@ -22,7 +21,6 @@ namespace BoardGameWithRobot.ImageProcessing
             this.cameraService = cam;
         }
 
-        //TODO:incomplete
         public bool DetectRobotDuringGame()
         {
             var curves =
@@ -57,19 +55,19 @@ namespace BoardGameWithRobot.ImageProcessing
                     c2 = boundary;
                     if (c1 == null || c2 == null)
                         throw new ArgumentOutOfRangeException();
-                    Point oldCenter = this.board.Robo.Center;
-                    Point newCenter = GeometryUtilis.PointBetweenPoints(c1.MassCenter, c2.MassCenter);
-                    Point diffVector = GeometryUtilis.DiffrenceVector(newCenter, oldCenter);
-                    this.board.Robo.FrontCircle = c1.MassCenter.X < c2.MassCenter.X ? c1 : c2;
-                    this.board.Robo.BackCircle = c1.MassCenter.X < c2.MassCenter.X ? c2 : c1;
+
+                    SquareBoundsCurve newFront = c1.MassCenter.X < c2.MassCenter.X ? c1 : c2;
+                    SquareBoundsCurve back = c1.MassCenter.X < c2.MassCenter.X ? c2 : c1;
+                    this.board.Robo.FrontVector = GeometryUtilis.DifferenceVector(newFront.MassCenter, back.MassCenter);
+                    Point diffVector = GeometryUtilis.DifferenceVector(newFront.MassCenter, this.board.Robo.FrontCircle.MassCenter);
                     this.board.Robo.GlobalPosition = new Point(
                         this.board.Robo.GlobalPosition.X + diffVector.X,
                         this.board.Robo.GlobalPosition.Y + diffVector.Y);
-                    this.DefineRobotRegion(newCenter,
-                        (int)GeometryUtilis.NormOfVecotr(this.board.Robo.FrontVector), false);
+                    this.DefineRobotRegion(null, false);
                     return true;
                 }
             }
+            this.DefineRobotRegion(null, false);
             return false;
         }
 
@@ -106,13 +104,11 @@ namespace BoardGameWithRobot.ImageProcessing
                     if (c1 == null || c2 == null)
                         throw new ArgumentOutOfRangeException();
                     this.board.Robo.FrontCircle = c1.MassCenter.X < c2.MassCenter.X ? c1 : c2;
-                    this.board.Robo.BackCircle = c1.MassCenter.X < c2.MassCenter.X ? c2 : c1;
                     return true;
                 }
             }
             return false;
         }
-
 
         public bool DetectRobotOnInit()
         {
@@ -146,7 +142,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     c2 = boundary;
                     if (c1 == null || c2 == null)
                         throw new ArgumentOutOfRangeException();
-                    this.board.Robo = new Robot(c1.MassCenter.X < c2.MassCenter.X ? c1 : c2, c1.MassCenter.X < c2.MassCenter.X ? c2 : c1);
+                    this.board.Robo = new Robot(c1.MassCenter.X < c2.MassCenter.X ? c1 : c2);
                     this.DefineRobotRegion(c1, c2, true);
                     return this.SecondDetectionOnInit();
                 }
@@ -167,16 +163,19 @@ namespace BoardGameWithRobot.ImageProcessing
 
         private void DefineRobotRegion(SquareBoundsCurve c1, SquareBoundsCurve c2, bool init)
         {
-            this.DefineRobotRegion(GeometryUtilis.PointBetweenPoints(c1.MassCenter, c2.MassCenter),
-                (int) (GeometryUtilis.DistanceBetweenPoints(c1.MassCenter, c2.MassCenter)), init);
+            this.DefineRobotRegion(GeometryUtilis.PointBetweenPoints(c1.MassCenter, c2.MassCenter), init);
         }
 
-        //TODO: problem ejst taki że jak nie znajdzie raz to koniec, definiować ten sam region w momencie jak nie znajdzie trzeba
-        private void DefineRobotRegion(Point center, int radius, bool init)
+        private void DefineRobotRegion(Point? center, bool init)
         {
-            SquareBoundsCurve curve = new SquareBoundsCurve(center, radius);
+            center = center ?? new Point(0, 0);
+            SquareBoundsCurve curve = new SquareBoundsCurve(center.Value, Constants.RobotImageRadius);
 #if DEBUG
-            DrawingService.PutSquareOnImage(init ? this.cameraService.ActualFrame : this.Image.Mat, curve);
+            if (this.Image != null)
+            {
+                var rob = this.Image.Mat.Clone();
+                this.cameraService.ShowMatrix(rob, "robot");
+            }
 #endif
             this.Image?.Dispose();
             this.Image =
@@ -185,12 +184,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     init
                         ? curve
                         : new SquareBoundsCurve(
-                            new Point(center.X + this.board.Robo.DiffVector.X,
-                                center.Y + this.board.Robo.DiffVector.Y), radius));
-#if DEBUG
-            var resized = this.Image.Mat.Clone();
-            this.cameraService.ShowMatrix(resized, "robot");
-#endif
+                            new Point(this.board.Robo.GlobalPosition.X + Constants.RobotImageRadius / 2, this.board.Robo.GlobalPosition.Y), Constants.RobotImageRadius));
         }
     }
 }

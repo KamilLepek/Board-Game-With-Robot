@@ -76,8 +76,6 @@ namespace BoardGameWithRobot.ImageProcessing
 
         public bool InitializeRobotConnection()
         {
-            //TODO: delete this
-            return true;
             MessageLogger.LogMessage("Initializing SSH connection with robot..");
             RobotControllingService.InitializeSshConnectionParams();
             try

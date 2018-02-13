@@ -139,8 +139,7 @@ namespace BoardGameWithRobot.Map
 
         public void PrintRobotTrackersOnBoard(Mat image)
         {
-            this.Robo.PrintTrackersOnBoard(image);
-            this.Robo.PrintFrontLineOnBoard(image);
+            this.Robo.PrintRobotFrontOnBoard(image);
         }
     }
 }
