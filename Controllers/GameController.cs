@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BoardGameWithRobot.ImageProcessing;
 using BoardGameWithRobot.Map;
@@ -79,6 +80,7 @@ namespace BoardGameWithRobot.Controllers
         public void PlayGame()
         {
             bool finishFlag = false;
+            Task.Factory.StartNew(RobotControllingService.TryToPushForward);
             while (!finishFlag)
             {
                 this.timer.Restart();
@@ -97,8 +99,8 @@ namespace BoardGameWithRobot.Controllers
                 this.cameraService.ShowFrame();
                 Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " +
                                   (int) (1000 / this.timer.ElapsedMilliseconds) + " fps.");
-                Console.WriteLine($"Angle: {GeometryUtilis.AngleBetweenVectors(RobotControllingService.Vector, this.board.Robo.FrontVector)}");
             }
+            RobotControllingService.State = Enums.RobotControllingState.Finished;
         }
 
         private void SetFragmentsOfImageForTrackersDetection()
@@ -119,7 +121,7 @@ namespace BoardGameWithRobot.Controllers
             this.board.PrintTrackersOnImage(this.cameraService.ActualFrame);
             this.board.PrintFieldsOnBoard(this.cameraService.ActualFrame);
             this.board.PrintPawnsSquarePlaceOnBoard(this.cameraService.ActualFrame);
-            this.board.PrintRobotTrackLineOnBoard(this.cameraService.ActualFrame);
+            //this.board.PrintRobotTrackLineOnBoard(this.cameraService.ActualFrame);
             this.board.PrintRobotTrackersOnBoard(this.cameraService.ActualFrame);
         }
 
@@ -146,7 +148,20 @@ namespace BoardGameWithRobot.Controllers
 
         private void ChangeStateUponMovementFinishDetection(ref bool finishFlag)
         {
-            this.robotDetectingService.DetectRobotDuringGame();
+            if (this.player == Enums.Player.Robot)
+            {
+                RobotControllingService.RobotTurn = true;
+                this.robotDetectingService.DetectRobotDuringGame();
+                if (RobotControllingService.State == Enums.RobotControllingState.Wait)
+                {
+                    RobotControllingService.Angle = GeometryUtilis.AngleBetweenVectors(RobotControllingService.Vector,
+                        this.board.Robo.FrontVector);
+                    if (this.gamePawnsDetectingService.PawnDetectionAfterMovementFramesAmount == 0)
+                        RobotControllingService.State = Enums.RobotControllingState.Forward;
+                }
+            }
+            else
+                RobotControllingService.RobotTurn = false;
             if (this.gamePawnsDetectingService.DetectPawnOnExpectedField(ref this.dicePipsNumber, this.player)) //validate that player has finished his movement!
             {
                 if (this.board.PawnsList.FindIndex(v => v.SquareNumber == Constants.NumberOfFields / 2) >= 0)
@@ -157,6 +172,8 @@ namespace BoardGameWithRobot.Controllers
                 this.gamePawnsDetectingService.PawnDetectionAfterMovementFramesAmount = 0;
                 this.situation = Enums.Situation.AwaitToRollTheDice;
                 this.ChangeTurn();
+                RobotControllingService.State = Enums.RobotControllingState.Wait;
+                RobotControllingService.RobotTurn = false;
             }
         }
 

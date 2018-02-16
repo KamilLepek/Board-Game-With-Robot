@@ -77,7 +77,7 @@ namespace BoardGameWithRobot.Utilities
         #region Field constants
 
         public const int AmountOfInitFramesToSearchForFields = 20;
-        public const int NumberOfFields = 18;
+        public const int NumberOfFields = 16;
         public const int FieldSizeIgnoringMargin = 10000;
 
         #endregion
@@ -89,7 +89,7 @@ namespace BoardGameWithRobot.Utilities
         public const int PawnContourSizeBottomConstraint = 1000;
         public const int PawnContourSizeTopConstraint = 3000;
         public const int PawnDistanceFromFieldMargin = 50;
-        public const int AmountOfFramesToDeterminePawn = 5;
+        public const int AmountOfFramesToDeterminePawn = 6;
 
         #endregion
 

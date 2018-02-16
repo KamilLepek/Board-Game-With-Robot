@@ -19,5 +19,14 @@
             Active,
             Inactive
         }
+
+        public enum RobotControllingState
+        {
+            Forward,
+            Backward,
+            Correct,
+            Wait,
+            Finished
+        }
     }
 }

@@ -1,11 +1,19 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 using Renci.SshNet;
 
 namespace BoardGameWithRobot.Utilities
 {
     internal static class RobotControllingService
     {
+        public static Enums.RobotControllingState State = Enums.RobotControllingState.Wait;
+
+        public static bool RobotTurn = false; //TODO: pretty redundant
+
+        public static double Angle;
+
         public static SshClient Ssh { get; private set; }
 
         public static Point TrackStartPoint { get; set; }
@@ -23,31 +31,80 @@ namespace BoardGameWithRobot.Utilities
                 Constants.Password);
         }
 
-        public static void RunRemoteControlScript(string action, int duration)
+        private static SshCommand RunRemoteControlScript(string action, int duration)
         {
             if (!Ssh.IsConnected)
                 throw new Exception("Client not connected");
-            Ssh.RunCommand($"python {Constants.RemoteControlScript} {action} {duration}");
+            return Ssh.CreateCommand($"python {Constants.RemoteControlScript} {action} {duration}");
         }
 
-        public static void GoForward(int miliseconds)
+        public static SshCommand GoForward(int miliseconds)
         {
-            RunRemoteControlScript("forward", miliseconds);
+            return RunRemoteControlScript("forward", miliseconds);
         }
 
-        public static void GoBackward(int miliseconds)
+        public static SshCommand GoBackward(int miliseconds)
         {
-            RunRemoteControlScript("backward", miliseconds);
+            return RunRemoteControlScript("backward", miliseconds);
         }
 
-        public static void GoLeft(int miliseconds)
+        public static SshCommand GoLeft(int miliseconds)
         {
-            RunRemoteControlScript("left", miliseconds);
+            return RunRemoteControlScript("left", miliseconds);
         }
 
-        public static void GoRight(int miliseconds)
+        public static SshCommand GoRight(int miliseconds)
         {
-            RunRemoteControlScript("right", miliseconds);
+            return RunRemoteControlScript("right", miliseconds);
+        }
+
+        public static void Cleanup()
+        {
+            RunRemoteControlScript("cleanup", 0).Execute();
+        }
+
+        public static void TryToPushForward()
+        {
+            Stopwatch st = new Stopwatch();
+            while (State != Enums.RobotControllingState.Finished)
+            {
+                switch (State)
+                {
+                    case Enums.RobotControllingState.Forward:
+                        st.Restart();
+                        GoForward(90).Execute();
+                        Thread.Sleep(10);
+                        GoForward(90).Execute();
+                        State = Enums.RobotControllingState.Backward;
+                        break;
+                    case Enums.RobotControllingState.Backward:
+                        GoBackward(100).Execute();
+                        State = Enums.RobotControllingState.Correct;
+                        break;
+                    case Enums.RobotControllingState.Correct:
+                        if (Angle < -1.25)
+                            GoRight(8 * (int)Math.Abs(Angle)).Execute();
+                        else if (Angle > 1.25)
+                            GoLeft(8 * (int)Math.Abs(Angle)).Execute();
+                        State = Enums.RobotControllingState.Wait;
+                        break;
+                    case Enums.RobotControllingState.Wait:
+                        if (st.Elapsed.Seconds > 5 && RobotTurn) // when we are too close to the pawn for too long
+                        {
+                            GoForward(130).Execute();
+                            GoBackward(100).Execute();
+                            st.Restart();
+                        }
+                        else if (!RobotTurn)
+                            st.Restart();
+                        Thread.Sleep(1000);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                
+                Console.WriteLine($"Angle: {Angle}");
+            }
         }
     }
 }

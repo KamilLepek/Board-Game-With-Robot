@@ -26,6 +26,7 @@ namespace BoardGameWithRobot
         static void OnProcessExit(object sender, EventArgs e)
         {
             Console.WriteLine("Disconnecting Ssh");
+            RobotControllingService.Cleanup();
             RobotControllingService.Ssh.Disconnect();
             RobotControllingService.Ssh.Dispose();
         }
