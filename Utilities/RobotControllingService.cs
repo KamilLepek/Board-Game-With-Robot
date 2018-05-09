@@ -38,22 +38,22 @@ namespace BoardGameWithRobot.Utilities
             return Ssh.CreateCommand($"python {Constants.RemoteControlScript} {action} {duration}");
         }
 
-        public static SshCommand GoForward(int miliseconds)
+        private static SshCommand GoForward(int miliseconds)
         {
             return RunRemoteControlScript("forward", miliseconds);
         }
 
-        public static SshCommand GoBackward(int miliseconds)
+        private static SshCommand GoBackward(int miliseconds)
         {
             return RunRemoteControlScript("backward", miliseconds);
         }
 
-        public static SshCommand GoLeft(int miliseconds)
+        private static SshCommand GoLeft(int miliseconds)
         {
             return RunRemoteControlScript("left", miliseconds);
         }
 
-        public static SshCommand GoRight(int miliseconds)
+        private static SshCommand GoRight(int miliseconds)
         {
             return RunRemoteControlScript("right", miliseconds);
         }
