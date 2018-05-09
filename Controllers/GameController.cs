@@ -35,7 +35,7 @@ namespace BoardGameWithRobot.Controllers
 
         private Enums.Player player;
 
-        private Enums.Situation situation;
+        private Enums.Situation currentStateOfGame;
 
         private bool diceHasBeenSpotted = false;
 
@@ -68,7 +68,7 @@ namespace BoardGameWithRobot.Controllers
                 return false;
             if (!this.initializator.InitializeRobotConnection())
                 return false;
-            this.situation = Enums.Situation.AwaitToRollTheDice;
+            this.currentStateOfGame = Enums.Situation.AwaitToRollTheDice;
             this.player = Enums.Player.Human;
             MessageBox.Show("Initialization Completed! Press ok to start.");
             return true;
@@ -131,7 +131,7 @@ namespace BoardGameWithRobot.Controllers
         private void AnalyzeAndChangeStateOfGame(ref bool finishFlag)
         {
             this.IncrementFramesAndCheckTrackersState();
-            switch (this.situation)
+            switch (this.currentStateOfGame)
             {
                 case Enums.Situation.AwaitToRollTheDice:
                     MessageLogger.LogMessage($"{this.player.ToString()} turn. Roll the dice!");
@@ -155,7 +155,7 @@ namespace BoardGameWithRobot.Controllers
                 if (RobotControllingService.State == Enums.RobotControllingState.Wait)
                 {
                     RobotControllingService.Angle = GeometryUtilis.AngleBetweenVectors(RobotControllingService.Vector,
-                        this.board.Robo.FrontVector);
+                        this.board.MovingSystem.FrontVector);
                     if (this.gamePawnsDetectingService.PawnDetectionAfterMovementFramesAmount == 0)
                         RobotControllingService.State = Enums.RobotControllingState.Forward;
                 }
@@ -170,7 +170,7 @@ namespace BoardGameWithRobot.Controllers
                     MessageLogger.LogMessage($"{this.player.ToString()} won!");
                 }
                 this.gamePawnsDetectingService.PawnDetectionAfterMovementFramesAmount = 0;
-                this.situation = Enums.Situation.AwaitToRollTheDice;
+                this.currentStateOfGame = Enums.Situation.AwaitToRollTheDice;
                 this.ChangeTurn();
                 RobotControllingService.State = Enums.RobotControllingState.Wait;
                 RobotControllingService.RobotTurn = false;
@@ -195,7 +195,7 @@ namespace BoardGameWithRobot.Controllers
                         this.diceDetectingService.IsDiceRegionDefined = false;
                         this.diceHasBeenSpotted = false;
                         this.diceHasBeenSpottedAndFinishedMovement = false;
-                        this.situation = Enums.Situation.AwaitForReaction;
+                        this.currentStateOfGame = Enums.Situation.AwaitForReaction;
                     }
                 }
                 else

@@ -58,11 +58,11 @@ namespace BoardGameWithRobot.ImageProcessing
 
                     SquareBoundsCurve newFront = c1.MassCenter.X < c2.MassCenter.X ? c1 : c2;
                     SquareBoundsCurve back = c1.MassCenter.X < c2.MassCenter.X ? c2 : c1;
-                    this.board.Robo.FrontVector = GeometryUtilis.DifferenceVector(newFront.MassCenter, back.MassCenter);
-                    Point diffVector = GeometryUtilis.DifferenceVector(newFront.MassCenter, this.board.Robo.FrontCircle.MassCenter);
-                    this.board.Robo.GlobalPosition = new Point(
-                        this.board.Robo.GlobalPosition.X + diffVector.X,
-                        this.board.Robo.GlobalPosition.Y + diffVector.Y);
+                    this.board.MovingSystem.FrontVector = GeometryUtilis.DifferenceVector(newFront.MassCenter, back.MassCenter);
+                    Point diffVector = GeometryUtilis.DifferenceVector(newFront.MassCenter, this.board.MovingSystem.FrontCircle.MassCenter);
+                    this.board.MovingSystem.GlobalPosition = new Point(
+                        this.board.MovingSystem.GlobalPosition.X + diffVector.X,
+                        this.board.MovingSystem.GlobalPosition.Y + diffVector.Y);
                     this.DefineRobotRegion(null, false);
                     return true;
                 }
@@ -103,7 +103,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     c2 = boundary;
                     if (c1 == null || c2 == null)
                         throw new ArgumentOutOfRangeException();
-                    this.board.Robo.FrontCircle = c1.MassCenter.X < c2.MassCenter.X ? c1 : c2;
+                    this.board.MovingSystem.FrontCircle = c1.MassCenter.X < c2.MassCenter.X ? c1 : c2;
                     return true;
                 }
             }
@@ -142,7 +142,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     c2 = boundary;
                     if (c1 == null || c2 == null)
                         throw new ArgumentOutOfRangeException();
-                    this.board.Robo = new Robot(c1.MassCenter.X < c2.MassCenter.X ? c1 : c2);
+                    this.board.MovingSystem = new Robot(c1.MassCenter.X < c2.MassCenter.X ? c1 : c2);
                     this.DefineRobotRegion(c1, c2, true);
                     return this.SecondDetectionOnInit();
                 }
@@ -184,7 +184,7 @@ namespace BoardGameWithRobot.ImageProcessing
                     init
                         ? curve
                         : new SquareBoundsCurve(
-                            new Point(this.board.Robo.GlobalPosition.X + Constants.RobotImageRadius / 2, this.board.Robo.GlobalPosition.Y), Constants.RobotImageRadius));
+                            new Point(this.board.MovingSystem.GlobalPosition.X + Constants.RobotImageRadius / 2, this.board.MovingSystem.GlobalPosition.Y), Constants.RobotImageRadius));
         }
     }
 }
