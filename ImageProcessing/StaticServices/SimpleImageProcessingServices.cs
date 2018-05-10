@@ -9,7 +9,7 @@ using Emgu.CV.Util;
 
 namespace BoardGameWithRobot.ImageProcessing
 {
-    internal class SimpleImageProcessingServices
+    internal static class SimpleImageProcessingServices
     {
         public static VectorOfVectorOfPoint DetectEdgesAsCurvesOnImage(Mat image, Mat hierarchy = null)
         {

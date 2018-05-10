@@ -1,6 +1,6 @@
 ﻿namespace BoardGameWithRobot.Utilities
 {
-    internal class Enums
+    internal static class Enums
     {
         public enum Player
         {

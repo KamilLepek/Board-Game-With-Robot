@@ -2,7 +2,7 @@
 
 namespace BoardGameWithRobot.Utilities
 {
-    internal class Constants
+    internal static class Constants
     {
         public const int DistanceFromLastPositionIgnoringMargin = 5;
         public const int DistanceFromCenterThatDiceIsSearched = 350;
