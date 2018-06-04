@@ -29,8 +29,6 @@ namespace BoardGameWithRobot.Controllers
 
         private readonly RobotDetectingService robotDetectingService;
 
-        private readonly Stopwatch timer = new Stopwatch();
-
         private int dicePipsNumber;
 
         private Enums.Player player;
@@ -83,7 +81,6 @@ namespace BoardGameWithRobot.Controllers
             Task.Factory.StartNew(RobotControllingService.TryToPushForward);
             while (!finishFlag)
             {
-                this.timer.Restart();
                 this.cameraService.GetCameraFrame();
                 this.SetFragmentsOfImageForTrackersDetection();
 
@@ -97,8 +94,6 @@ namespace BoardGameWithRobot.Controllers
                 this.AnalyzeAndChangeStateOfGame(ref finishFlag);
                 this.DisplayElementsOnBoard();
                 this.cameraService.ShowFrame();
-                Console.WriteLine(this.timer.ElapsedMilliseconds + " ms between frames. " +
-                                  (int) (1000 / this.timer.ElapsedMilliseconds) + " fps.");
             }
             RobotControllingService.State = Enums.RobotControllingState.Finished;
         }
